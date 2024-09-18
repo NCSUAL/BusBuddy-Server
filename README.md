@@ -96,7 +96,7 @@
 
 </br>
 <h3>DB ERD</h3>
-
 </br>
 <h3>System Architecture</h3>
 
+[![시스템 아키텍쳐](https://i.ibb.co/94dBsmg/image.png)](https://example.com)
