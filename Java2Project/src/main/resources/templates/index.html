@@ -1,13 +1,20 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Form</title>
 </head>
 <body>
-    <h1>Test</h1>
+<h2>Submit Username and Content</h2>
+<form action="/api/submit" method="POST" enctype="multipart/form-data">
+    <label for="username">사용자 이름: </label><br>
+    <input type="text" id="username" name="username" required><br><br>
+
+    <label for="content">내용</label><br>
+    <input type="text" id="content" name="content" required><br><br>
+
+    <button type="submit">저장</button>
+</form>
 </body>
 </html>
