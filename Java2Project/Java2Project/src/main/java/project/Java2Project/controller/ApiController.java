@@ -17,12 +17,10 @@ import java.util.Optional;
 public class ApiController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @Autowired
     public ApiController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     // 모든 유저 조회
