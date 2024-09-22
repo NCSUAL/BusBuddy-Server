@@ -3,7 +3,7 @@ package project.Java2Project.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.Java2Project.domain.Content;
+import project.Java2Project.domain.UserData;
 import project.Java2Project.domain.User;
 import project.Java2Project.repository.ContentRepository;
 import project.Java2Project.repository.UserRepository;
@@ -39,10 +39,10 @@ public class UserService {
             userRepository.save(user);
 
         }
-        Content content = new Content();
-        content.setContent(contentText);
-        content.setUser(user);
-        contentRepository.save(content);
+        UserData userData = new UserData();
+        userData.setContent(contentText);
+        userData.setUser(user);
+        contentRepository.save(userData);
     }
 
     // 모든 유저 조회
@@ -87,13 +87,13 @@ public class UserService {
 
     // 유저 이름으로 등록된 내용 수정
     @Transactional
-    public Optional<Content> updateContent(String userName, Long contentId, String newContent) {
-        Optional<Content> contentOptional = contentRepository.findById(contentId);
-        if (contentOptional.isPresent() && contentOptional.get().getUser().getUsername().equals(userName)) {
-            Content content = contentOptional.get();
-            content.setContent(newContent);
-            contentRepository.save(content);
-            return Optional.of(content);
+    public Optional<UserData> updateContent(String userName, Long contentId, String newContent) {
+        Optional<UserData> userDataOptional = contentRepository.findById(contentId);
+        if (userDataOptional.isPresent() && userDataOptional.get().getUser().getUsername().equals(userName)) {
+            UserData userData = userDataOptional.get();
+            userData.setContent(newContent);
+            contentRepository.save(userData);
+            return Optional.of(userData);
         } else {
             return Optional.empty();
         }
@@ -102,8 +102,8 @@ public class UserService {
     // 유저 이름으로 등록된 내용 삭제
     @Transactional
     public boolean deleteContent(String userName, Long contentId) {
-        Optional<Content> contentOptional = contentRepository.findById(contentId);
-        if (contentOptional.isPresent() && contentOptional.get().getUser().getUsername().equals(userName)) {
+        Optional<UserData> userDataOptional = contentRepository.findById(contentId);
+        if (userDataOptional.isPresent() && userDataOptional.get().getUser().getUsername().equals(userName)) {
             contentRepository.deleteById(contentId);
             return true;
         } else {

@@ -1,9 +1,10 @@
 package project.Java2Project.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.Java2Project.domain.Content;
+import project.Java2Project.domain.UserData;
 import project.Java2Project.domain.User;
 import project.Java2Project.dto.UserContentDTO;
 import project.Java2Project.repository.UserRepository;
@@ -12,6 +13,7 @@ import project.Java2Project.service.UserService;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
 public class ApiController {
@@ -64,9 +66,9 @@ public class ApiController {
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            List<Content> contents = user.getContents();
+            List<UserData> userData = user.getUserData();
 
-            List<UserContentDTO> userContentDTOs = contents.stream()
+            List<UserContentDTO> userContentDTOs = userData.stream()
                     .map(content -> new UserContentDTO(user.getUsername(), content.getId(), content.getContent()))
                     .toList();
             return ResponseEntity.ok(userContentDTOs);
@@ -77,8 +79,8 @@ public class ApiController {
 
     // 내용 수정
     @PutMapping("/name/{userName}/contents/{contentId}")
-    public ResponseEntity<Content> updateUserContent(@PathVariable String userName, @PathVariable Long contentId, @RequestParam String newContent) {
-        Optional<Content> updatedContent = userService.updateContent(userName, contentId, newContent);
+    public ResponseEntity<UserData> updateUserContent(@PathVariable String userName, @PathVariable Long contentId, @RequestParam String newContent) {
+        Optional<UserData> updatedContent = userService.updateContent(userName, contentId, newContent);
         return updatedContent.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
