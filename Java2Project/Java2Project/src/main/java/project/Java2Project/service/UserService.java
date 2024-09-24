@@ -37,8 +37,8 @@ public class UserService {
             user.setUsername(username);
             user.setCreatedAt(LocalDateTime.now());
             userRepository.save(user);
-
         }
+
         UserData userData = new UserData();
         userData.setContent(contentText);
         userData.setUser(user);

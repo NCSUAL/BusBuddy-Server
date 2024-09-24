@@ -1,13 +1,11 @@
 package project.Java2Project.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.Java2Project.domain.UserData;
 import project.Java2Project.domain.User;
+import project.Java2Project.domain.UserData;
 import project.Java2Project.dto.UserContentDTO;
-import project.Java2Project.repository.UserRepository;
 import project.Java2Project.service.UserService;
 
 import java.util.List;
@@ -19,11 +17,6 @@ import java.util.Optional;
 public class ApiController {
 
     private final UserService userService;
-
-    @Autowired
-    public ApiController(UserService userService, UserRepository userRepository) {
-        this.userService = userService;
-    }
 
     // 모든 유저 조회
     @GetMapping
@@ -78,17 +71,17 @@ public class ApiController {
     }
 
     // 내용 수정
-    @PutMapping("/name/{userName}/contents/{contentId}")
-    public ResponseEntity<UserData> updateUserContent(@PathVariable String userName, @PathVariable Long contentId, @RequestParam String newContent) {
-        Optional<UserData> updatedContent = userService.updateContent(userName, contentId, newContent);
+    @PutMapping("/name/{userName}/userdata/{userDataId}")
+    public ResponseEntity<UserData> updateUserContent(@PathVariable String userName, @PathVariable Long userDataId, @RequestParam String newContent) {
+        Optional<UserData> updatedContent = userService.updateContent(userName, userDataId, newContent);
         return updatedContent.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // 내용 삭제
-    @DeleteMapping("/name/{userName}/contents/{contentId}")
-    public ResponseEntity<Void> deleteContent(@PathVariable String userName, @PathVariable Long contentId) {
-        boolean isDeleted = userService.deleteContent(userName, contentId);
+    @DeleteMapping("/name/{userName}/userdata/{userDataId}")
+    public ResponseEntity<Void> deleteContent(@PathVariable String userName, @PathVariable Long userDataId) {
+        boolean isDeleted = userService.deleteContent(userName, userDataId);
         if (isDeleted) {
             return ResponseEntity.noContent().build();
         } else {
