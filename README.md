@@ -99,4 +99,4 @@
 </br>
 <h3>System Architecture</h3>
 
-[![시스템 아키텍쳐](https://i.ibb.co/94dBsmg/image.png)](https://example.com)
+![시스템아키텍쳐](https://github.com/user-attachments/assets/62bafcd0-81a6-4b4a-8d19-f7c328637f2e)
