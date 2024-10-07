@@ -2,9 +2,9 @@ name: BusBuddy CI - Spring
 
 on:
   push:
-    branches: [ "master" ]  # master 브랜치에 대한 푸시 이벤트 트리거
+    branches: [ "main" ]  # main 브랜치에 대한 푸시 이벤트 트리거
   pull_request:
-    branches: [ "master" ]  # master 브랜치에 대한 PR 이벤트 트리거
+    branches: [ "main" ]  # main 브랜치에 대한 PR 이벤트 트리거
 
 permissions:
   contents: read  # 최소한의 권한 설정
@@ -16,7 +16,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: server  # 모든 run 명령에 대한 기본 작업 디렉토리 설정
+        working-directory: Java2Project  # 모든 run 명령에 대한 기본 작업 디렉토리 설정
 
     steps:
     - name: Checkout repository
@@ -25,7 +25,7 @@ jobs:
     - name: Set up JDK 17
       uses: actions/setup-java@v3  # JDK 설정
       with:
-        java-version: '17'  # 사용하고자 하는 Java 버전
+        java-version: '17'  # Java 17 버전을 선택
         distribution: 'temurin'  # JDK 배포판 선택 (Eclipse Temurin)
 
     - name: Grant execute permission for gradlew
