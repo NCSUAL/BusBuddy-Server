@@ -32,18 +32,36 @@
 
 </br>
 <h3>☕기술 스택</h3>
+<h4>Back-end</h4>
+
+
+| [![스프링](https://img.icons8.com/color/96/spring-logo.png)](https://example.com) |
+|:-------------------------:|
+| 스프링 부트              |
+
+| [![mysql](https://img.icons8.com/?size=100&id=39858&format=png&color=000000)](https://example.com)| [![레디스](https://img.icons8.com/?size=100&id=DUsKDDZsg8FT&format=png&color=000000)](https://example.com) |
+|:-------------------------:|:-------------------------:|
+| MySQL       | Redis        |
+<img src="https://img.shields.io/badge/Socket.IO-010101?style=flat-square&logo=socketdotio&logoColor=white" height="25"/>  
+<div style="display: flex; align-items: center;">
+  <img src="https://img.shields.io/badge/Hibernate-59666C?style=flat-square&logo=hibernate&logoColor=white" height="25"/>  
+  <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white" height="25"/>  
+</div>
+</br>
+
 <h4>Front-end</h4>
 
 | [![플러터](https://img.icons8.com/fluency/96/flutter.png)](https://example.com) |
 |:-------------------------:|
 | 플러터                 |
 
-
-<h4>Back-end</h4>
-
-| [![스프링](https://img.icons8.com/color/96/spring-logo.png)](https://example.com) |
-|:-------------------------:|
-| 스프링              |
+<img src="https://img.shields.io/badge/Socket.IO-010101?style=flat-square&logo=socketdotio&logoColor=white" height="25"/>  
+<div style="display: flex; align-items: center;">
+  <img src="https://img.shields.io/badge/Getx-8A2BE2?style=flat-square&logo=getx&logoColor=white" height="25"/>  
+  <img src="https://img.shields.io/badge/Bloc Pattern-1E8CBE?style=flat-square&logo=&logoColor=white" height="25"/>
+  <img src="https://img.shields.io/badge/Provider-6B46C1?style=flat-square&logo=&logoColor=white" height="25"/>
+</div>
+</br>
 
 </br>
 <h3>🛠커밋 컨벤션</h3>
