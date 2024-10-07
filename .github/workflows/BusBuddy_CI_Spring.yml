@@ -1,8 +1,6 @@
 name: BusBuddy CI - Spring
 
 on:
-  push:
-    branches: [ "main" ]  # main 브랜치에 대한 푸시 이벤트 트리거
   pull_request:
     branches: [ "main" ]  # main 브랜치에 대한 PR 이벤트 트리거
 
