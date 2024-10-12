@@ -1,6 +1,7 @@
 package Java2Project.service;
 
 import Java2Project.domain.BusStop;
+import Java2Project.dto.request.LocationRequest;
 import Java2Project.exception.NotFoundBusStop;
 import Java2Project.repository.BusStopRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +25,22 @@ public class BusStopService {
     public List<BusStop> findByStopName(String stopName) {
         List<BusStop> busStop = busStopRepository.findByStopName(stopName);
         if(busStop.isEmpty()) {
-            throw new NotFoundBusStop("해당 버스정류장은 존재하지 않습니다.");
+            throw new NotFoundBusStop("해당 버스정류장이 없습니다.");
         }
         else{
             return busStop;
         }
     }
 
+
+    public BusStop findByLocation(LocationRequest locationRequest){
+        Optional<BusStop> busStop = busStopRepository.findByLatitudeAndLongitudeWithOption(locationRequest.latitude(), locationRequest.longitude());
+        if(busStop.isPresent()) {
+            return busStop.get();
+        }
+        else{
+            throw new NotFoundBusStop("해당 버스정류장이 없습니다.");
+        }
+    }
 
 }

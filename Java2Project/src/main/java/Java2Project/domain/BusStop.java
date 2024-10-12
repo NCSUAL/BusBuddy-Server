@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class BusStop {
+
     @Id
     @GeneratedValue
     @Column(name = "id")
@@ -35,9 +36,10 @@ public class BusStop {
     }
 
     @Builder
-    public BusStop(String stopName, BigDecimal latitude, BigDecimal longitude) {
+    public BusStop(String stopName, BigDecimal latitude, BigDecimal longitude,String cityName) {
         this.stopName = stopName;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.cityName = cityName;
     }
 }
