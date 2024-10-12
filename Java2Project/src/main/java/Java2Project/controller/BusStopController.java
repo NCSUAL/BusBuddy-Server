@@ -1,17 +1,17 @@
 package Java2Project.controller;
 
 import Java2Project.domain.BusStop;
+import Java2Project.dto.request.LocationRequest;
 import Java2Project.dto.response.BusStopResponse;
 import Java2Project.service.BusStopService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import javax.xml.stream.Location;
 import java.util.List;
 
 @Controller
@@ -22,9 +22,9 @@ public class BusStopController {
     @Autowired
     private BusStopService busStopService;
 
-    //버스 정류장 이름으로 조회 -> 버스 정류장 찾기
+    //버스 정류장 이름으로 버스 정류장 찾기
     @GetMapping("/busStop/{name}")
-    public ResponseEntity<List<BusStopResponse>> getBusStop(@PathVariable("name") String name){
+    public ResponseEntity<List<BusStopResponse>> getBusStopByBusStopName(@PathVariable("name") String name){
 //        List<BusStop> busStop = busStopService.findByStopName(name);
 //
 //        List<BusStopResponse> busStopResponses = new ArrayList<>();
@@ -42,6 +42,16 @@ public class BusStopController {
                         .map(BusStopResponse::of) //.map(BusStop -> BusStopResponse.of(BusStop))
                         .toList()
                 );
+    }
+
+    //위도, 경도로 버스 정류장 찾기
+    @PostMapping("/busStop")
+    public ResponseEntity<BusStopResponse> getBusStopByLatitudeAndLongitude(@Valid @RequestBody LocationRequest locationRequest){
+        return ResponseEntity.ok(
+                BusStopResponse.of(
+                        busStopService.findByLocation(locationRequest)
+                )
+        );
     }
 
 }
