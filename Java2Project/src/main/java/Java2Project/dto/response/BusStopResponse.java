@@ -8,40 +8,43 @@ import java.math.BigDecimal;
 
 @Getter
 public class BusStopResponse {
-    private Long id;
+    private String busStopId;
     private String stopName;
     private BigDecimal latitude;
     private BigDecimal longitude;
+    private Integer cityCode;
     private String cityName;
 
     @Builder
-    private BusStopResponse(Long id, String stopName, BigDecimal latitude, BigDecimal longitude,String cityName){
-        this.id = id;
+    private BusStopResponse( String stopName, BigDecimal latitude, BigDecimal longitude,String cityName,String busStopId,Integer cityCode) {
+        this.busStopId = busStopId;
         this.stopName = stopName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.cityName = cityName;
+        this.cityCode = cityCode;
     }
 
-
     //factory
-    public static BusStopResponse of(Long id, String stopName, BigDecimal latitude, BigDecimal longitude,String cityName){
+    public static BusStopResponse of( String stopName, BigDecimal latitude, BigDecimal longitude,String cityName,String busStopId,Integer cityCode){
         return BusStopResponse.builder()
-                .id(id)
                 .stopName(stopName)
+                .busStopId(busStopId)
                 .latitude(latitude)
                 .longitude(longitude)
+                .cityCode(cityCode)
                 .cityName(cityName)
                 .build();
     }
 
     public static BusStopResponse of(BusStop busStop){
         return BusStopResponse.builder()
-                .id(busStop.getBusStopId())
                 .stopName(busStop.getStopName())
+                .busStopId(busStop.getBusStopId())
                 .latitude(busStop.getLatitude())
                 .longitude(busStop.getLongitude())
                 .cityName(busStop.getCityName())
+                .cityCode(busStop.getCityCode())
                 .build();
     }
 

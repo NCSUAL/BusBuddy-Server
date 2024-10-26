@@ -2,6 +2,7 @@ package Java2Project.controller;
 
 import Java2Project.domain.BusStop;
 import Java2Project.dto.request.LocationRequest;
+import Java2Project.dto.response.ArriveBusProvideResponse;
 import Java2Project.dto.response.BusStopResponse;
 import Java2Project.service.BusStopService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.stream.Location;
+import java.net.URISyntaxException;
 import java.util.List;
 
 @Controller
@@ -51,6 +53,16 @@ public class BusStopController {
                 BusStopResponse.of(
                         busStopService.findByLocation(locationRequest)
                 )
+        );
+    }
+
+
+    // 1. 위도, 경도로 버스 정류장 찾기
+    // 2. 실시간 버스 도착 시간 가져오기
+    @PostMapping("/bus")
+    public ResponseEntity<ArriveBusProvideResponse> getArriveBusAndBusStop(@Valid @RequestBody LocationRequest locationRequest) throws URISyntaxException {
+        return ResponseEntity.ok(
+                busStopService.arriveBusInfo(locationRequest)
         );
     }
 
