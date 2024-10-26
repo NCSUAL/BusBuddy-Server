@@ -9,9 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.View;
-
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +16,6 @@ import java.util.Map;
 @ControllerAdvice
 public class BusStopExceptionHandler {
 
-    private final View error;
-
-    public BusStopExceptionHandler(View error) {
-        this.error = error;
-    }
 
     //버스정류장을 찾지 못했을 때
     @ResponseStatus(HttpStatus.BAD_REQUEST)

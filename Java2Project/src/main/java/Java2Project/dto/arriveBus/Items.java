@@ -1,5 +1,4 @@
-package Java2Project.dto.web;
-
+package Java2Project.dto.arriveBus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
