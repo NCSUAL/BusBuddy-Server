@@ -6,28 +6,28 @@
 <ol>
   <h4>
   <li>
-      실시간 교통 정보 확인
+      실시간 버스 위치 조회
     </h4>
   </li>
-    <blockquote>사용자들은 대중교통의 실시간 교통 상황과 노선 정보를 확인할 수 있습니다.</blockquote>
+    <blockquote>정류장 노선에서 곧 도착 할 버스들의 위치 정보를 제공합니다</blockquote>
     <h4>
   <li>
       정류장 편의시설 상태 공유
     </h4>
   </li>
-    <blockquote>각 정류장에 있는 의자, 충전기, 온열기 등의 편의시설 상태를 사용자들이 리뷰로 공유합니다.</blockquote>
+    <blockquote>정류장에 있는 편의시설 상태를 사용자들이 리뷰로 공유합니다</blockquote>
     <h4>
   <li>
       노선 종점/출발 시각 확인
     </h4>
   </li>
-    <blockquote>노선별 종점과 출발지의 예정 시각을 실시간으로 확인하여 더 효율적인 대중교통 이용을 지원합니다.</blockquote>
+    <blockquote>노선별 종점과 출발지의 예정 시각을 실시간으로 확인합니다</blockquote>
     <h4>
   <li>
-      정류장 리뷰 시스템
+     길찾기
     </h4>
   </li>
-    <blockquote>사용자들이 정류장에 대한 리뷰를 작성하고, 편의시설 정보를 다른 이용자들과 공유 합니다.</blockquote>
+    <blockquote>출발지와 목적지 간에 최단 경로를 제공합니다</blockquote>
 </ol>
 
 </br>
