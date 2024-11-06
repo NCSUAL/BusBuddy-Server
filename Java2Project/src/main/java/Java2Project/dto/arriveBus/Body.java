@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @Setter
 @ToString
 public class Body {
-    private Items items;
+    private ArriveBusItems items;
     @Getter
     private int numOfRows;
     @Getter
@@ -17,9 +17,9 @@ public class Body {
     @Getter
     private int totalCount;
 
-    public Items getItems() {
+    public ArriveBusItems getItems() {
         if(items == null){
-            items = new Items();
+            items = new ArriveBusItems();
             items.setItem(new ArrayList<>());
         }
         return items;

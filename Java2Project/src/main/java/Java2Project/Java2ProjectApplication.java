@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Java2ProjectApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Java2ProjectApplication.class, args);
+		SpringApplication application = new SpringApplication(Java2ProjectApplication.class);
+		application.setAdditionalProfiles("main"); // 메인 환경
+		application.run(args);
 	}
 
 }
