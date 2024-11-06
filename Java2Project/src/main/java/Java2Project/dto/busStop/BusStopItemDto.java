@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ItemDto {
+public class BusStopItemDto {
     private int citycode;
     private double gpslati;
     private double gpslong;

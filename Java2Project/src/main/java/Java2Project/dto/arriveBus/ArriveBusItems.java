@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class Items {
+public class ArriveBusItems {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<ItemDto> item;
+    private List<ArriveBusItemDto> item;
 }

@@ -48,11 +48,12 @@ public class BusStopController {
 
     //위도, 경도로 버스 정류장 찾기
     @PostMapping("/busStop")
-    public ResponseEntity<BusStopResponse> getBusStopByLatitudeAndLongitude(@Valid @RequestBody LocationRequest locationRequest){
+    public ResponseEntity<List<BusStopResponse>> getBusStopByLatitudeAndLongitude(@Valid @RequestBody LocationRequest locationRequest){
         return ResponseEntity.ok(
-                BusStopResponse.of(
                         busStopService.findByLocation(locationRequest)
-                )
+                                .stream()
+                                .map(busStop -> BusStopResponse.of(busStop))
+                                .toList()
         );
     }
 
