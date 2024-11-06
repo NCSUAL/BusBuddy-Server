@@ -31,6 +31,7 @@ import java.util.*;
 @Transactional(readOnly = true) //연관관계의 주인이 아니면 읽기만 가능해야 함.
 @PropertySource("classpath:uri.properties")
 @PropertySource("classpath:secret.properties")
+
 public class BusStopService {
 
     private final BusStopRepository busStopRepository;
