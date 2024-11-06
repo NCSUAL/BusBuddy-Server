@@ -11,7 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
-@TestPropertySource("classpath:uri.properties")
+@TestPropertySource("classpath:uritest.properties")
 @ExtendWith(SpringExtension.class)
 public class UriConfigurationTest {
 
