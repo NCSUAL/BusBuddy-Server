@@ -1,6 +1,6 @@
 package Java2Project.dto.process;
 
-import Java2Project.dto.arriveBus.ItemDto;
+import Java2Project.dto.arriveBus.ArriveBusItemDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,29 +8,29 @@ import lombok.Getter;
 public class ArriveBusDto {
     private String busStopCount; //도착지까지 남은 정류장 수
     private String arriveTime;   //도착까지 남은 시간(초)
-    private Integer busNumber;   //버스 노선 번호
+    private String busNumber;   //버스 노선 번호
 
     @Builder
-    private ArriveBusDto(String busStopCount, String arriveTime, Integer busNumber) {
+    private ArriveBusDto(String busStopCount, String arriveTime, String busNumber) {
         this.arriveTime = arriveTime;
         this.busStopCount = busStopCount;
         this.busNumber = busNumber;
     }
 
     //factory
-    public static ArriveBusDto of(ItemDto itemDto){
+    public static ArriveBusDto of(ArriveBusItemDto arriveBusItemDto){
         //도착 시간을 가져옴
-        int arrtime = itemDto.getArrtime();
-        int minutes = arrtime / 60;
+        int arrtime = arriveBusItemDto.getArrtime();
         int seconds = arrtime % 60;
+        int minutes = arrtime / 60 + (seconds>=40? 1: 0);
 
-        String arriveTime = minutes<1? "곧 도착" : minutes +" 분 "+ seconds+ " 초";
+        String arriveTime = minutes<=3? "곧 도착" : minutes +"분";
 
         return ArriveBusDto
                 .builder()
-                .busNumber(itemDto.getRouteno())
+                .busNumber(arriveBusItemDto.getRouteno())
                 .arriveTime(arriveTime)
-                .busStopCount(itemDto.getArrprevstationcnt().toString())
+                .busStopCount(arriveBusItemDto.getArrprevstationcnt().toString())
                 .build();
     }
 

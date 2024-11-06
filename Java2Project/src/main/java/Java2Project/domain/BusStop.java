@@ -1,10 +1,8 @@
 package Java2Project.domain;
 
+import Java2Project.dto.busStop.BusStopItemDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -30,21 +28,33 @@ public class BusStop {
     @Column(name =  "city_code")
     private Integer cityCode;
 
-    @Column(name = "city_name")
-    private String cityName;
 
     protected BusStop(){
 
     }
 
     @Builder
-    public BusStop(String stopName, BigDecimal latitude, BigDecimal longitude,String cityName,Integer cityCode, String busStopId) {
+    private BusStop(String stopName, BigDecimal latitude, BigDecimal longitude,Integer cityCode, String busStopId) {
         this.stopName = stopName;
         this.latitude = latitude;
         this.busStopId = busStopId;
         this.longitude = longitude;
-        this.cityName = cityName;
         this.cityCode = cityCode;
+    }
 
+    public static BusStop of(BusStopItemDto busStopItemDto){
+        return BusStop.builder()
+                .busStopId(busStopItemDto.getNodeid())
+                .stopName(busStopItemDto.getNodenm())
+                .latitude(BigDecimal.valueOf(busStopItemDto.getGpslati()))
+                .longitude(BigDecimal.valueOf(busStopItemDto.getGpslong()))
+                .cityCode(busStopItemDto.getCitycode())
+                .build();
+    }
+
+    //연관관계 설정 시 파장을 일으킬 수 있음.
+    @Override
+    public String toString(){
+        return "busStopId: " + busStopId + ", stopName: " + stopName + ", latitude: " + latitude+ ", longitude: " + longitude+ ", cityCode: " + cityCode;
     }
 }
