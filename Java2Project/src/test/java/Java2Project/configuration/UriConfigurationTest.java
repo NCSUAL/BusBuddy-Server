@@ -2,20 +2,24 @@ package Java2Project.configuration;
 
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@SpringBootTest
 @TestPropertySource("classpath:uri.properties")
-public class UriConfiguration {
+@ExtendWith(SpringExtension.class)
+public class UriConfigurationTest {
 
-    @Value("${exampleURI}")
+    @Value("${arriveBusStop}")
     private String uri;
 
     @Test
-    public void getUri(){
-        System.out.println(uri);
+    public void testUri(){
         assertNotNull(uri);
     }
 }

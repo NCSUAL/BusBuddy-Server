@@ -16,14 +16,14 @@ public interface BusStopRepository extends JpaRepository<BusStop,Long> {
     List<BusStop> findByStopName(String stopName);
 
     //위도 경도로 BusStop 객체 불러옴
-    //오차 -0.0001 ~ +0.0001 (약 8.82m)
+    //반경 300m 정류장을 가져옴
     @Query("SELECT " +
             "M " +
             "FROM BusStop M " +
-            "WHERE M.latitude BETWEEN :latitude-0.0001 AND :latitude+0.0001 " +
-            "AND M.longitude BETWEEN  :longitude-0.0001 AND :longitude+0.0001"
+            "WHERE M.latitude BETWEEN :latitude-0.001 AND :latitude+0.001 " +
+            "AND M.longitude BETWEEN  :longitude-0.001 AND :longitude+0.001"
     )
-    Optional<BusStop> findByLatitudeAndLongitudeWithOption(@Param("latitude") double latitude, @Param("longitude") double longitude);
+    List<BusStop> findByLatitudeAndLongitudeWithOption(@Param("latitude") double latitude, @Param("longitude") double longitude);
 
 }
 
