@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Java2Project.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Java2Project.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/자바 팀플.iml" filepath="$PROJECT_DIR$/.idea/자바 팀플.iml" />
     </modules>
   </component>
