@@ -27,6 +27,16 @@ public class BusStopReview {
     @Column(nullable = false)
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now(); // 리뷰 작성 시간
 
+
+    //Getter and Setter for 'busStopId'
+    public String getStopId() {
+        return stopId;
+    }
+
+    public void setStopId(String stopId) {
+        this.stopId = stopId;
+    }
+
     //Getter and Setter for 'reveiwtext'
     public String getReviewText() {
         return reviewText;
