@@ -31,4 +31,15 @@ public class BusStopReviewService {
     public BusStopReview getReviewbyId(Long reviewId){
         return reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
     }
+
+    //Update 리뷰 업데이트 메서드
+    public BusStopReview updateReview(Long reviewId, BusStopReview updatedReview){
+        BusStopReview existingReview = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
+
+        //기존 리뷰 업데이트
+        existingReview.setReviewText(updatedReview.getReviewText());
+        existingReview.setRating(updatedReview.getRating());
+
+        return reviewRepository.save(existingReview);
+    }
 }
