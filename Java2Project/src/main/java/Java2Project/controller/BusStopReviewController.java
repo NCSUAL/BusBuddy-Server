@@ -56,4 +56,11 @@ public class BusStopReviewController {
         return ResponseEntity.ok(savedReview);
     }
 
+    //Delete 특정 리뷰 삭제 API
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId){
+        busStopReviewService.deleteReview(reviewId);
+        return ResponseEntity.noContent().build();//상태코드 204반환
+    }
+
 }

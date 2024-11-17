@@ -42,4 +42,10 @@ public class BusStopReviewService {
 
         return reviewRepository.save(existingReview);
     }
+
+    //Delete 특정 리뷰 삭제 메서드
+    public void deleteReview(Long reviewId){
+        BusStopReview review = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
+        reviewRepository.delete(review);
+    }
 }
