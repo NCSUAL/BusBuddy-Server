@@ -29,7 +29,7 @@ public class BusStopReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saveReview);
     }
 
-    //Read API (특정 정류장의 리뷰 목록 조회
+    //Read API (특정 정류장의 리뷰 목록 조회)
     @GetMapping
     public ResponseEntity<List<BusStopReview>> getReviewsByBusStopId(@PathVariable String busStopId){
         List<BusStopReview> reviews = busStopReviewService.getReviewsByBusStopId(busStopId);
@@ -41,6 +41,19 @@ public class BusStopReviewController {
     public ResponseEntity<BusStopReview> getReviewById(@PathVariable Long reviewId){
         BusStopReview review = busStopReviewService.getReviewbyId(reviewId);
         return ResponseEntity.ok(review);
+    }
+
+    //UPDATE API(특정 리뷰 업데이트)
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<BusStopReview> updateReview(
+            @PathVariable String busStopId,
+            @PathVariable Long reviewId,
+            @RequestBody BusStopReview updatedReview
+    ){
+        //리뷰 업데이트
+        updatedReview.setBusStopId(busStopId);
+        BusStopReview savedReview = busStopReviewService.updateReview(reviewId, updatedReview);
+        return ResponseEntity.ok(savedReview);
     }
 
 }

@@ -64,5 +64,12 @@ public class BusStopReview {
         this.rating = rating;
     }
 
+    //Getter and Setter for 'busStopId'
+    public String getBusStopId(){
+        return stopId;
+    }
 
+    public void setBusStopId(String busStopId){
+        this.stopId = busStopId;
+    }
 }
