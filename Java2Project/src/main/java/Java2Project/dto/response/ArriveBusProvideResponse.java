@@ -7,11 +7,11 @@ import java.util.List;
 
 @Getter
 public class ArriveBusProvideResponse {
-    private BusStopResponse busStopResponse;
+    private List<BusStopResponse> busStopResponse;
     private List<ArriveBusDto> items;
 
     @Builder
-    public ArriveBusProvideResponse(BusStopResponse busStopResponse, List<ArriveBusDto> items) {
+    public ArriveBusProvideResponse(List<BusStopResponse> busStopResponse, List<ArriveBusDto> items) {
         this.busStopResponse = busStopResponse;
         this.items = items;
     }
