@@ -24,7 +24,7 @@ public class ArriveBusDto {
         int seconds = arrtime % 60;
         int minutes = arrtime / 60 + (seconds>=40? 1: 0);
 
-        String arriveTime = minutes<=3? "곧 도착" : minutes +"분";
+        String arriveTime = minutes<=2? "곧 도착" : minutes +"분";
 
         return ArriveBusDto
                 .builder()
