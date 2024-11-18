@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.RestClientException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,7 @@ public class BusStopExceptionHandler {
     //데이터가 null 임.
     //위도, 경도 범위가 적절하지 않음.
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class,})
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Map<String,String>> locationNotValidException(MethodArgumentNotValidException ex){
         Map<String, String> errors = new HashMap<>();
 
@@ -40,6 +42,12 @@ public class BusStopExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
+    //외부 api 요청 실패
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ExceptionHandler({RestClientException.class})
+    public ResponseEntity<?> failedApiRequest(){
+        return ResponseEntity.badRequest().body("api 요청을 실패하였습니다.");
+    }
 
 
 }

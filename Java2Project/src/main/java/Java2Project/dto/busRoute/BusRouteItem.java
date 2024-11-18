@@ -1,6 +1,7 @@
-package Java2Project.dto.busStop;
+package Java2Project.dto.busRoute;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,8 @@ import java.util.List;
 
 @Getter
 @Setter
-public class BusStopItems {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class BusRouteItem {
     @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-    private List<BusStopItemDto> item;
+    List<BusRouteItemDto> item;
 }

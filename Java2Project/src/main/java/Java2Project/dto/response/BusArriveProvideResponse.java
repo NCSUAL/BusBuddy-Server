@@ -6,12 +6,12 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class ArriveBusProvideResponse {
+public class BusArriveProvideResponse {
     private List<BusStopResponse> busStopResponse;
     private List<ArriveBusDto> items;
 
     @Builder
-    public ArriveBusProvideResponse(List<BusStopResponse> busStopResponse, List<ArriveBusDto> items) {
+    public BusArriveProvideResponse(List<BusStopResponse> busStopResponse, List<ArriveBusDto> items) {
         this.busStopResponse = busStopResponse;
         this.items = items;
     }
