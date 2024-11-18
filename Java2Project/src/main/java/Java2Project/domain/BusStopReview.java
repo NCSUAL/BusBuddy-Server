@@ -2,19 +2,28 @@ package Java2Project.domain;
 
 import jakarta.persistence.*;
 import Java2Project.domain.BusStop;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "bus_stop_reviews")
-
 public class BusStopReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;// 리뷰 ID
 
-    @Column(nullable = false)
-    private String stopId;// bus_stops 테이블과 연결되는 정류장 ID
+    // bus_stops 테이블과 연결되는 정류장 ID
+    //연관된 부모 하나만 조회
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "busStopId")
+    private BusStop stopId;
 
     @Column(nullable = false)
     private String userId;// user테이블과 연결되는 사용자 ID
@@ -27,49 +36,17 @@ public class BusStopReview {
     @Column(nullable = false)
     private java.time.LocalDateTime createdAt = java.time.LocalDateTime.now(); // 리뷰 작성 시간
 
+    protected BusStopReview() {
 
-    //Getter and Setter for 'busStopId'
-    public String getStopId() {
-        return stopId;
     }
 
-    public void setStopId(String stopId) {
-        this.stopId = stopId;
-    }
-
-    //Getter and Setter for 'reveiwtext'
-    public String getReviewText() {
-        return reviewText;
-    }
-
-    public void setReviewText(String reviewText) {
-        this.reviewText = reviewText;
-    }
-
-    //Getter and Setter for 'reviewId'
-    public Long getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(Long reviewId) {
+    @Builder
+    public BusStopReview(Long reviewId, BusStop stopId, String userId, Integer rating, String reviewText, LocalDateTime createdAt) {
         this.reviewId = reviewId;
-    }
-
-    //Getter and Setter for 'rating'
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
+        this.stopId = stopId;
+        this.userId = userId;
         this.rating = rating;
-    }
-
-    //Getter and Setter for 'busStopId'
-    public String getBusStopId(){
-        return stopId;
-    }
-
-    public void setBusStopId(String busStopId){
-        this.stopId = busStopId;
+        this.reviewText = reviewText;
+        this.createdAt = createdAt;
     }
 }
