@@ -1,4 +1,4 @@
-package Java2Project.dto.arriveBus;
+package Java2Project.dto.busArrive;
 
 
 import lombok.Getter;
