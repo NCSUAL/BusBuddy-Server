@@ -1,6 +1,5 @@
-package Java2Project.dto.response;
+package Java2Project.dto.arriveBus;
 
-import Java2Project.dto.arriveBus.BusArriveResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

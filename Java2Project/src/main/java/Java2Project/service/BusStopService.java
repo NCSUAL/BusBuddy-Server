@@ -6,7 +6,7 @@ import Java2Project.dto.busStop.BusStopItemDto;
 import Java2Project.dto.busStop.BusStopItems;
 import Java2Project.dto.process.ArriveBusDto;
 import Java2Project.dto.request.LocationRequest;
-import Java2Project.dto.response.ArriveBusInfoResponse;
+import Java2Project.dto.arriveBus.ArriveBusInfoResponse;
 
 import Java2Project.dto.response.ArriveBusProvideResponse;
 import Java2Project.dto.response.BusStopResponse;
@@ -23,7 +23,6 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.*;
@@ -51,6 +50,10 @@ public class BusStopService {
     //버스 정류장 위치 정보 URI
     @Value("${locationBusStop}")
     private String locationBusStop;
+
+    //버스 정류장 노선 정보 URI
+    @Value("${busRoute}")
+    private String busRoute;
 
     //공공데이터 serviceKey
     @Value("${serviceKey}")
@@ -155,9 +158,11 @@ public class BusStopService {
         }
     }
 
+
+
     //정류소별 도착 예정 정보 목록 조회
     /*
-    정류소별로 실시간 도착 예정 정보 및 운행정보 목록을 조회한다.
+    정류소별로 실시간 도착 예정 정보 및 운행정보 목록,노선 정보를 조회한다.
     */
     @Transactional
     public ArriveBusProvideResponse arriveBusInfo(LocationRequest locationRequest){
@@ -218,7 +223,4 @@ public class BusStopService {
                 .items(items.stream().map(arriveBusItemDto -> ArriveBusDto.of(arriveBusItemDto)).toList())
                 .build();
     }
-
-
-
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class ArriveBusDto {
     private String busStopCount; //도착지까지 남은 정류장 수
-    private String nodenm;
+    private String nodenm;       //현재 버스가 위치한 정류장
     private String arriveTime;   //도착까지 남은 시간(초)
     private String busNumber;   //버스 노선 번호
 

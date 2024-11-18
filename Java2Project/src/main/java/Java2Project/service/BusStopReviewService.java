@@ -23,9 +23,6 @@ public class BusStopReviewService {
     }
 
     //READ(특정 정류장의 리뷰 목록 조회
-    public List<BusStopReview> getReviewsByBusStopId(String busStopId){
-        return reviewRepository.findBySopId(busStopId);
-    }
 
     //특정 리뷰 상세조회
     public BusStopReview getReviewbyId(Long reviewId){

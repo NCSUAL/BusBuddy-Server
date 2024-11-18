@@ -24,17 +24,11 @@ public class BusStopReviewController {
             @PathVariable String busStopId,
             @RequestBody BusStopReview review
     ){
-        review.setStopId(busStopId);
         BusStopReview saveReview = busStopReviewService.createReview(review);
         return ResponseEntity.status(HttpStatus.CREATED).body(saveReview);
     }
 
     //Read API (특정 정류장의 리뷰 목록 조회)
-    @GetMapping
-    public ResponseEntity<List<BusStopReview>> getReviewsByBusStopId(@PathVariable String busStopId){
-        List<BusStopReview> reviews = busStopReviewService.getReviewsByBusStopId(busStopId);
-        return ResponseEntity.ok(reviews);
-    }
 
     //특정 리뷰 상세 조회
     @GetMapping("/{reviewId}")
@@ -50,8 +44,6 @@ public class BusStopReviewController {
             @PathVariable Long reviewId,
             @RequestBody BusStopReview updatedReview
     ){
-        //리뷰 업데이트
-        updatedReview.setBusStopId(busStopId);
         BusStopReview savedReview = busStopReviewService.updateReview(reviewId, updatedReview);
         return ResponseEntity.ok(savedReview);
     }
