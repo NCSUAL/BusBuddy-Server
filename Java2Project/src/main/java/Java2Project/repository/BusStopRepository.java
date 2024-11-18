@@ -17,7 +17,7 @@ public interface BusStopRepository extends JpaRepository<BusStop,Long> {
 
 
     //위도 경도로 BusStop 객체 불러옴
-    //반경 300m 정류장을 가져옴
+    //반경 8m 정류장을 가져옴
     @Query("SELECT " +
             "M " +
             "FROM BusStop M " +

@@ -19,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.*;
@@ -153,41 +155,53 @@ public class BusStopService {
         }
     }
 
-    //정류소별도착예정정보 목록 조회
+    //정류소별 도착 예정 정보 목록 조회
     /*
-    정류소별로 실시간 도착예정정보 및 운행정보 목록을 조회한다.
+    정류소별로 실시간 도착 예정 정보 및 운행정보 목록을 조회한다.
     */
-
+    @Transactional
     public ArriveBusProvideResponse arriveBusInfo(LocationRequest locationRequest){
-        //위도 경도로 버스 정류장의 정보를 가져옴
-        BusStop busStop = findByLocation(locationRequest).get(0);
-
-        log.info("id: {}, code: {}",busStop.getBusStopId(),busStop.getCityCode());
-        //encode 중복 방지 URI 처리
-        //replaceQuery를 사용하여 이미 인코딩된 쿼리 파라미터 전체를 URI로 설정
-        URI uri = UriComponentsBuilder.fromHttpUrl(arriveBusStop)
-                .replaceQuery(String.format(
-                        "serviceKey=%s&pageNo=%d&numOfRows=%d&_type=%s&cityCode=%d&nodeId=%s",
-                        serviceKey,1, 10, "json"
-                        , busStop.getCityCode()
-                        , busStop.getBusStopId()
-                ))
-                .build(true) // 추가 인코딩 방지
-                .toUri();
-
-
-        ArriveBusInfoResponse arriveBusInfoResponse = webClient
-                .get() //get 요청
-                .uri(uri)
-                .retrieve() //RequestAndConfirm
-
-                //데이터 받음
-                .bodyToMono(ArriveBusInfoResponse.class)//형변환 -> Jackson
-                .block(); //동기식으로 바꿈 추후에 Non-blocking 방식을 사용할거임.
-
         //데이터 가공
-        List<ArriveBusItemDto> items = arriveBusInfoResponse.getResponse().getBody().getItems().getItem();
+        List<ArriveBusItemDto> items = new ArrayList<>();
 
+
+        log.info("-- 정류소 도착 예정 정보 동기식으로 공공데이터에 요청 --");
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start();
+
+        //위도 경도로 버스 정류장의 정보를 가져옴
+        List<BusStop> busStop = findByLocation(locationRequest);
+
+        busStop.stream().forEach(busStop1 ->
+        {
+            //encode 중복 방지 URI 처리
+            //replaceQuery를 사용하여 이미 인코딩된 쿼리 파라미터 전체를 URI로 설정
+            URI uri = UriComponentsBuilder.fromHttpUrl(arriveBusStop)
+                    .replaceQuery(String.format(
+                            "serviceKey=%s&pageNo=%d&numOfRows=%d&_type=%s&cityCode=%d&nodeId=%s",
+                            serviceKey,1, 10, "json"
+                            , busStop1.getCityCode()
+                            , busStop1.getBusStopId()
+                    ))
+                    .build(true) // 추가 인코딩 방지
+                    .toUri();
+
+
+            ArriveBusInfoResponse arriveBusInfoResponse = webClient
+                    .get() //get 요청
+                    .uri(uri)
+                    .retrieve() //RequestAndConfirm
+
+                    //데이터 받음
+                    .bodyToMono(ArriveBusInfoResponse.class) //형변환 -> Jackson
+                    .block(); //동기식으로 바꿈 추후에 Non-blocking 방식을 사용할 거임.
+
+            log.info("id: {}, code: {}",busStop1.getBusStopId(),busStop1.getCityCode());
+
+            items.addAll(arriveBusInfoResponse.getResponse().getBody().getItems().getItem());
+        });
+        stopWatch.stop();
 
         //객체 정렬
         Collections.sort(items, new Comparator<ArriveBusItemDto>() {
@@ -197,8 +211,10 @@ public class BusStopService {
             }
         });
 
+        log.info("총 걸린 시간: {}",stopWatch.getTotalTimeMillis());
+
         return ArriveBusProvideResponse.builder()
-                .busStopResponse(BusStopResponse.of(busStop))
+                .busStopResponse(busStop.stream().map(busStop1 -> BusStopResponse.of(busStop1)).toList())
                 .items(items.stream().map(arriveBusItemDto -> ArriveBusDto.of(arriveBusItemDto)).toList())
                 .build();
     }
