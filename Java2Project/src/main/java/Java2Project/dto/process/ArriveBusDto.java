@@ -7,12 +7,14 @@ import lombok.Getter;
 @Getter
 public class ArriveBusDto {
     private String busStopCount; //도착지까지 남은 정류장 수
+    private String nodenm;
     private String arriveTime;   //도착까지 남은 시간(초)
     private String busNumber;   //버스 노선 번호
 
     @Builder
-    private ArriveBusDto(String busStopCount, String arriveTime, String busNumber) {
+    private ArriveBusDto(String busStopCount, String arriveTime, String busNumber,String nodenm) {
         this.arriveTime = arriveTime;
+        this.nodenm = nodenm;
         this.busStopCount = busStopCount;
         this.busNumber = busNumber;
     }
@@ -29,6 +31,7 @@ public class ArriveBusDto {
         return ArriveBusDto
                 .builder()
                 .busNumber(arriveBusItemDto.getRouteno())
+                .nodenm(arriveBusItemDto.getNodenm())
                 .arriveTime(arriveTime)
                 .busStopCount(arriveBusItemDto.getArrprevstationcnt().toString())
                 .build();
