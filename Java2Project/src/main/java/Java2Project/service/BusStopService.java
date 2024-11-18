@@ -148,7 +148,7 @@ public class BusStopService {
                 }
 
                 log.info("* 데이터 필터링 진행 *");
-                //list의 첫값과 nodeno가 같은 원소를 필터링하고 리턴
+                //list의 첫값과 nodeno가 같은 원소를 필터링하고 리턴한다
                 List<BusStop> busStops =  items
                         .stream()
                         .filter(busStopItemDto -> items.get(0).getNodeno() == busStopItemDto.getNodeno())
