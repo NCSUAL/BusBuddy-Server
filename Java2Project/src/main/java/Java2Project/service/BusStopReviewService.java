@@ -48,4 +48,21 @@ public class BusStopReviewService {
         BusStopReview review = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
         reviewRepository.delete(review);
     }
+
+    //특정 사용자가 작성한 리뷰 조회
+    public List<BusStopReview> getReviewsByUserId(Long userId){
+        return reviewRepository.findByUserId(userId);
+    }
+
+    //특정 리뷰 삭제 (사용자 권한 확인 포함)
+    public void deleteReviewByUserId(Long reviewId, Long userId){
+        BusStopReview review = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
+
+        if (!review.getUserId().equals(userId)){
+            throw new IllegalArgumentException("You do not have permission to delete this review");
+        }
+
+        reviewRepository.delete(review);
+    }
+
 }

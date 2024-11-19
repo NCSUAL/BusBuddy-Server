@@ -175,7 +175,6 @@ public class BusStopService {
                 .build(true) // 추가 인코딩 방지
                 .toUri();
 
-
         ArriveBusInfoResponse arriveBusInfoResponse = webClient
                 .get() //get 요청
                 .uri(uri)
@@ -202,7 +201,4 @@ public class BusStopService {
                 .items(items.stream().map(arriveBusItemDto -> ArriveBusDto.of(arriveBusItemDto)).toList())
                 .build();
     }
-
-
-
 }
