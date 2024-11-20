@@ -1,6 +1,6 @@
 package Java2Project.client;
 import Java2Project.domain.BusStop;
-import Java2Project.dto.busArrive.ArriveBusInfoResponse;
+import Java2Project.dto.busArrive.BusArriveItem;
 import Java2Project.dto.busArrive.BusArriveItemDto;
 import Java2Project.dto.busRoute.BusRouteItem;
 import Java2Project.dto.busRoute.BusRouteItemDto;
@@ -8,21 +8,23 @@ import Java2Project.dto.busStop.BusStopItem;
 import Java2Project.dto.busStop.BusStopItemDto;
 import Java2Project.dto.request.LocationRequest;
 import Java2Project.exception.JsonProcessing;
-import Java2Project.exception.NotFoundBusStop;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -75,7 +77,8 @@ public class NationalBusStopClient {
                     ))
                     .build(true) // 추가 인코딩 방지
                     .toUri();
-            log.info("uri: {}" , uri);
+
+            log.info("노선 정보 uri: {}" , uri);
 
             return webClient
                     .get()
@@ -88,14 +91,14 @@ public class NationalBusStopClient {
                         try {
                             return Mono.just(objectMapper.treeToValue(jsonNode, BusRouteItem.class).getItem());
                         } catch (JsonProcessingException e) {
-                            return Mono.error(new JsonProcessing("서버 오류가 발생하였습니다. 이유: Json 변환 실패"));
+                            return Mono.error(new JsonProcessing("서버 오류가 발생하였습니다. 이유: 노선 Json 변환 실패"));
                         }
-                    });
+                    })
+                    ;
     }
 
     //버스정류장 위치 정보 요청
-    public List<BusStopItemDto> busStopLocationRequest(LocationRequest locationRequest){
-        try {
+    public Mono<List<BusStopItemDto>> busStopLocationRequest(LocationRequest locationRequest){
             //공공데이터로 요청
             //encode 중복 방지 URI 처리
             //replaceQuery를 사용하여 이미 인코딩된 쿼리 파라미터 전체를 URI로 설정
@@ -109,49 +112,60 @@ public class NationalBusStopClient {
                     .build(true) // 추가 인코딩 방지
                     .toUri();
 
-            log.info("uri: {}" , uri);
+            log.info("버스정류장 위치 uri: {}" , uri);
 
-            //버스 정류장 정보 요청
-            JsonNode getBusStop = restTemplate.getForObject(uri, JsonNode.class);
-
-            log.info("** 요청 성공 **");
-            //트리구조로 items까지 내려감
-            JsonNode searchTree = getBusStop.path("response").path("body").path("items");
-
-            return objectMapper.treeToValue(searchTree, BusStopItem.class).getItem();
+            return webClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .map(jsonNode -> jsonNode.path("response").path("body").path("items"))
+                    .flatMap(jsonNode -> {
+                        try {
+                            return Mono.just(objectMapper.treeToValue(jsonNode,BusStopItem.class).getItem());
+                        } catch (JsonProcessingException e) {
+                            return Mono.error(new JsonProcessing("서버 오류가 발생하였습니다. 이유: 버스정류장 Json 변환 실패"));
+                        }
+                    });
         }
-        catch (Exception e){
-            log.info("조회 실패: {}",e.getMessage());
-            throw new NotFoundBusStop("해당 범위에 버스정류장은 없습니다.");
-        }
-    }
 
     //정류장별로 도착 예정 정보 요청
-    public List<BusArriveItemDto> busArriveRequest(BusStop busStop){
-        //encode 중복 방지 URI 처리
-        //replaceQuery를 사용하여 이미 인코딩된 쿼리 파라미터 전체를 URI로 설정
+    public Mono<List<BusArriveItemDto>> busArriveRequest(BusStop busStop) {
         URI uri = UriComponentsBuilder.fromHttpUrl(busArrive)
                 .replaceQuery(String.format(
                         "serviceKey=%s&pageNo=%d&numOfRows=%d&_type=%s&cityCode=%d&nodeId=%s",
-                        serviceKey,1, 10, "json"
-                        , busStop.getCityCode()
-                        , busStop.getBusStopId()
+                        serviceKey, 1, 10, "json", busStop.getCityCode(), busStop.getBusStopId()
                 ))
-                .build(true) // 추가 인코딩 방지
+                .build(true)
                 .toUri();
 
+        log.info("정류장별로 도착 예정 정보 URI: {}", uri);
 
-        ArriveBusInfoResponse arriveBusInfoResponse = webClient
-                .get() //get 요청
+        return webClient.get()
                 .uri(uri)
-                .retrieve() //RequestAndConfirm
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .doOnNext(jsonNode -> log.info("응답 데이터: {}", jsonNode.toPrettyString()))
+                .map(jsonNode -> jsonNode.path("response").path("body").path("items"))
+                .flatMap(jsonNode -> {
+                    log.info("itemsNode 데이터: {}", jsonNode.toPrettyString());
 
-                //데이터 받음
-                .bodyToMono(ArriveBusInfoResponse.class) //형변환 -> Jackson
-                .block(); //동기식으로 바꿈 추후에 Non-blocking 방식을 사용할 거임.
+                    log.info("value: {}",jsonNode.getClass());
 
-        log.info("id: {}, code: {}",busStop.getBusStopId(),busStop.getCityCode());
+                    if (!(jsonNode instanceof ObjectNode)) {
+                        log.info("value: {}",jsonNode.getClass());
+                        return Mono.just(Collections.emptyList());
+                    }
 
-        return arriveBusInfoResponse.getResponse().getBody().getItems().getItem();
+                    try {
+                        List<BusArriveItemDto> itemList = objectMapper.treeToValue(jsonNode,BusArriveItem.class).getItem();
+                        log.info("itemList: {}", itemList);
+                        return Mono.just(itemList);
+                    } catch (JsonProcessingException e) {
+                        log.error("JSON 변환 실패: {}", e.getMessage(), e);
+                        return Mono.error(new IllegalArgumentException("도착정보 JSON 변환 실패", e));
+                    }
+                });
     }
+
 }

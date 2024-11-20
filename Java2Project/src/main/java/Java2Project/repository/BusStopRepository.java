@@ -21,8 +21,8 @@ public interface BusStopRepository extends JpaRepository<BusStop,String> {
     @Query("SELECT " +
             "M " +
             "FROM BusStop M " +
-            "WHERE M.latitude BETWEEN :latitude-0.002 AND :latitude+0.002 " +
-            "AND M.longitude BETWEEN  :longitude-0.002 AND :longitude+0.002"
+            "WHERE M.latitude BETWEEN :latitude-0.0008 AND :latitude+0.0008" +
+            "AND M.longitude BETWEEN  :longitude-0.0008 AND :longitude+0.0008"
     )
     List<BusStop> findByLatitudeAndLongitudeWithOption(@Param("latitude") double latitude, @Param("longitude") double longitude);
 
