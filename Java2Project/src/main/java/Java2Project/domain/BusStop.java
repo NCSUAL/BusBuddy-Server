@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "bus_stops")
@@ -28,18 +30,25 @@ public class BusStop {
     @Column(name =  "city_code")
     private Integer cityCode;
 
+    @Column(name = "nodeno")
+    private Integer nodeNo;
+    //cascade: DB 개념, 부모에서 데이터가 변경되면 자식에도 영향을 준다
+    //orpanRemoval: DB 개념, 부모와 자식이 끊어지면 자식 전체를 삭제한다.
+    @OneToMany(mappedBy = "busStop",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<BusStopReview> busStopReviews = new ArrayList<>();
 
     protected BusStop(){
 
     }
 
     @Builder
-    private BusStop(String stopName, BigDecimal latitude, BigDecimal longitude,Integer cityCode, String busStopId) {
+    private BusStop(String stopName, BigDecimal latitude, BigDecimal longitude,Integer cityCode, String busStopId,Integer nodeNo) {
         this.stopName = stopName;
         this.latitude = latitude;
         this.busStopId = busStopId;
         this.longitude = longitude;
         this.cityCode = cityCode;
+        this.nodeNo = nodeNo;
     }
 
     public static BusStop of(BusStopItemDto busStopItemDto){
@@ -49,6 +58,7 @@ public class BusStop {
                 .latitude(BigDecimal.valueOf(busStopItemDto.getGpslati()))
                 .longitude(BigDecimal.valueOf(busStopItemDto.getGpslong()))
                 .cityCode(busStopItemDto.getCitycode())
+                .nodeNo(busStopItemDto.getNodeno())
                 .build();
     }
 
