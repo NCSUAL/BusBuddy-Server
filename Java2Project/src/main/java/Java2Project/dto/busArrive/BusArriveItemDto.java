@@ -1,4 +1,4 @@
-    package Java2Project.dto.arriveBus;
+    package Java2Project.dto.busArrive;
 
     import lombok.Getter;
     import lombok.Setter;
@@ -7,7 +7,7 @@
     @Getter
     @Setter
     @ToString
-    public class ArriveBusItemDto {
+    public class BusArriveItemDto {
         private Integer arrprevstationcnt; //도착지까지 남은 정류장 수
         private Integer arrtime;          //도착까지 남은 시간(초)
         private String nodeid;            //정류장 고유 ID
