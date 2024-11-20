@@ -32,7 +32,7 @@ public class BusStop {
 
     //cascade: DB 개념, 부모에서 데이터가 변경되면 자식에도 영향을 준다
     //orpanRemoval: DB 개념, 부모와 자식이 끊어지면 자식 전체를 삭제한다.
-    @OneToMany(mappedBy = "stopId",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "busStop",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<BusStopReview> busStopReviews = new ArrayList<>();
 
     protected BusStop(){
