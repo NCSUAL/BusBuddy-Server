@@ -5,3 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BusStopReviewRepository extends JpaRepository<BusStopReview, Long> {
 }
+
+
