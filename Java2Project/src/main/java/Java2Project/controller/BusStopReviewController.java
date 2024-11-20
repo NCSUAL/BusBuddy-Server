@@ -36,5 +36,4 @@ public class BusStopReviewController {
         BusStopReview review = busStopReviewService.getReviewbyId(reviewId);
         return ResponseEntity.ok(review);
     }
-
 }
