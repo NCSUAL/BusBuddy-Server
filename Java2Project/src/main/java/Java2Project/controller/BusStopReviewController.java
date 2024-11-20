@@ -63,4 +63,11 @@ public class BusStopReviewController {
         return ResponseEntity.noContent().build();//상태코드 204반환
     }
 
+    //특정 사용자의 모든 리뷰 조회
+    @GetMapping
+    public ResponseEntity<List<BusStopReview>> getReviewsByUserId(@PathVariable Long userId){
+        List<BusStopReview> reviews = busStopReviewService.getReviewsByUserId(userId);
+        return ResponseEntity.ok(reviews);
+    }
+
 }

@@ -9,4 +9,9 @@ public interface BusStopReviewRepository extends JpaRepository<BusStopReview, Lo
 
     //특정 정류장의 리뷰 목록 조회
     List<BusStopReview> findByBusStopId(Long busStopId);
+
+    List<BusStopReview> findByUserId(Long userId);
+
 }
+
+
