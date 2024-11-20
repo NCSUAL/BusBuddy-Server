@@ -17,6 +17,7 @@ import Java2Project.repository.BusStopReviewRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,32 +28,16 @@ import java.util.*;
 @Service
 @Slf4j
 @PropertySource("classpath:uri.properties")
+@Transactional(readOnly = true)
 public class BusStopService {
 
     private final BusStopRepository busStopRepository;
 
-    private final BusStopReviewRepository busStopReviewRepository;
-
     private final NationalBusStopClient nationalBusStopClient;
 
-    public BusStopService(BusStopRepository busStopRepository,BusStopReviewRepository busStopReviewRepository,NationalBusStopClient nationalBusStopClient) {
+    public BusStopService(BusStopRepository busStopRepository,NationalBusStopClient nationalBusStopClient) {
         this.busStopRepository = busStopRepository;
-        this.busStopReviewRepository = busStopReviewRepository;
         this.nationalBusStopClient = nationalBusStopClient;
-    }
-
-    //댓글 추가
-    public ReviewResponse addComment(ReviewRequest reviewRequest){
-        //BusStopId로 정류장 조회
-        BusStop busStop = busStopRepository.findById(reviewRequest.busStopId())
-                .stream().findFirst().orElseThrow(() -> new NotFoundBusStop("해당 버스 정류장은 없습니다."));
-
-        return ReviewResponse.of(busStopReviewRepository.save(BusStopReview
-                .builder()
-                .busStop(busStop)
-                .rating(reviewRequest.Rated())
-                .reviewText(reviewRequest.comment())
-                .build()));
     }
 
     //노선 정보 조회
@@ -61,6 +46,7 @@ public class BusStopService {
     }
 
     //공공데이터 api 요청 받고 데이터를 저장할 수 있음.
+    @Transactional
     public Mono<List<BusStop>> busStopInfo(LocationRequest locationRequest){
         return Mono.fromCallable(() -> busStopRepository.findByLatitudeAndLongitudeWithOption(
                         locationRequest.latitude(),
