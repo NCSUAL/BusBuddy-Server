@@ -1,6 +1,6 @@
 package Java2Project.config;
 
-import Java2Project.dto.busArrive.ArriveBusItems;
+import Java2Project.dto.busArrive.BusArriveItem;
 import Java2Project.dto.busRoute.BusRouteItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
@@ -19,8 +19,8 @@ public class JacksonConfig {
         mapper.coercionConfigFor(List.class)
                 .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
         // Items 타입에 대한 빈 문자열을 null로 처리할 수도 있음
-        mapper.coercionConfigFor(ArriveBusItems.class)
-                .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsNull);
+        mapper.coercionConfigFor(BusArriveItem.class)
+                .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
         // Items 타입에 대한 빈 문자열을 null로 처리할 수도 있음
         mapper.coercionConfigFor(BusRouteItem.class)
                 .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);

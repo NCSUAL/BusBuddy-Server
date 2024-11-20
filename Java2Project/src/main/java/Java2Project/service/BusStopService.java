@@ -5,7 +5,7 @@ import Java2Project.domain.BusStopReview;
 import Java2Project.dto.busArrive.BusArriveItemDto;
 import Java2Project.dto.busRoute.BusRouteItemDto;
 import Java2Project.dto.busStop.BusStopItemDto;
-import Java2Project.dto.process.ArriveBusDto;
+import Java2Project.dto.process.BusArriveDto;
 import Java2Project.dto.request.LocationRequest;
 import Java2Project.dto.request.ReviewRequest;
 import Java2Project.dto.response.BusArriveProvideResponse;
@@ -18,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.*;
 
@@ -59,52 +61,40 @@ public class BusStopService {
     }
 
     //공공데이터 api 요청 받고 데이터를 저장할 수 있음.
-    public List<BusStop> findByLocation(LocationRequest locationRequest){
-        //위도 경도로 버스 정류장의 정보를 가져옴
-        log.info("*** DB에서 데이터 조회 ***");
-        List<BusStop> busStop = busStopRepository.findByLatitudeAndLongitudeWithOption(locationRequest.latitude(), locationRequest.longitude());
-
-        if(busStop.isEmpty()){
-            log.info("----- DB에 존재하지 않음 -----");
-            log.info("*** 정류장을 api로 요청 ***");
-
-                List<BusStopItemDto> busStopLocationRequest = nationalBusStopClient.busStopLocationRequest(locationRequest);
-
-                log.info("Data: {}",busStopLocationRequest);
-
-                if(busStopLocationRequest.isEmpty()){
-                    throw new NotFoundBusStop("해당 범위에 버스정류장은 없습니다.");
-                }
-
-                log.info("* 데이터 필터링 진행 *");
-                //list의 첫값과 nodeno가 같은 원소를 필터링하고 리턴한다
-                List<BusStop> busStops =  busStopLocationRequest
-                        .stream()
-                        .filter(busStopItemDto -> busStopLocationRequest.get(0).getNodeno() == busStopItemDto.getNodeno())
-                        .map(BusStop::of)
-                        .toList();
-
-                log.info("* 데이터 필터링 성공: {}", busStops);
-
-                log.info("*** 데이터 저장 ***");
-                busStopRepository.saveAll(busStops);
-
-                log.info("모든 작업이 정상적으로 처리 됨");
-                return busStops;
-        }
-        else{
-            busStop.sort(new Comparator<BusStop>() {
-                @Override
-                public int compare(BusStop o1, BusStop o2) {
-                    double a1 = Math.abs(locationRequest.latitude() - o1.getLatitude().doubleValue()) +
-                            Math.abs(locationRequest.latitude() - o1.getLongitude().doubleValue());
-                    double a2 = Math.abs(locationRequest.latitude() - o2.getLatitude().doubleValue()) +
-                            Math.abs(locationRequest.latitude() - o2.getLongitude().doubleValue());
-                    return Double.compare(a1,a2);
-                }
-            });
-            return busStop;
-        }
+    public Mono<List<BusStop>> busStopInfo(LocationRequest locationRequest){
+        return Mono.fromCallable(() -> busStopRepository.findByLatitudeAndLongitudeWithOption(
+                        locationRequest.latitude(),
+                        locationRequest.longitude()
+                ))
+                .subscribeOn(Schedulers.boundedElastic()) // 블로킹 작업을 전용 스레드에서 실행
+                .flatMap(busStops -> {
+                    if (busStops.isEmpty()) {
+                        log.info("*** DB에 데이터 없음, API 호출 진행 ***");
+                        return nationalBusStopClient.busStopLocationRequest(locationRequest)
+                                .doOnNext(busStopItemDtos -> {
+                                    log.info("Data: {}", busStopItemDtos);
+                                    if (busStopItemDtos.isEmpty()) {
+                                        throw new NotFoundBusStop("해당 범위에 버스정류장은 없습니다.");
+                                    }
+                                })
+                                .map(busStopItemDtos -> busStopItemDtos.stream()
+                                        .filter(busStopItemDto -> busStopItemDtos.get(0).getNodeno().equals(busStopItemDto.getNodeno()))
+                                        .map(BusStop::of)
+                                        .toList()
+                                )
+                                .doOnNext(filteredBusStops -> {
+                                    log.info("*** 필터링된 데이터 저장 ***");
+                                    busStopRepository.saveAll(filteredBusStops); // 여전히 블로킹 메서드
+                                    log.info("저장 완료");
+                                });
+                    } else {
+                        busStops.sort(Comparator.comparingDouble(busStop ->
+                                Math.abs(locationRequest.latitude() - busStop.getLatitude().doubleValue()) +
+                                        Math.abs(locationRequest.longitude() - busStop.getLongitude().doubleValue())
+                        ));
+                        return Mono.just(busStops.stream().filter(busStop -> busStops.get(0).getNodeNo().equals(busStop.getNodeNo())).toList());
+                    }
+                });
     }
 
 
@@ -112,55 +102,56 @@ public class BusStopService {
     /*
     정류소별로 실시간 도착 예정 정보 및 운행정보 목록,노선 정보를 조회한다.
     */
-    public BusArriveProvideResponse arriveBusInfo(LocationRequest locationRequest){
-        //데이터 가공
-        List<ArriveBusDto> arriveBusDtos = new ArrayList<>();
-
-        List<BusArriveItemDto> items = new ArrayList<>();
-
-        List<BusRouteItemDto> busRouteItemDtos = new ArrayList<>();
-
-        log.info("-- 정류소 도착 예정 정보 동기식으로 공공데이터에 요청 --");
+    public Mono<BusArriveProvideResponse> arriveBusInfo(LocationRequest locationRequest) {
+        log.info("-- 정류소 도착 예정 정보 비동기식으로 공공데이터에 요청 --");
         StopWatch stopWatch = new StopWatch();
-
         stopWatch.start();
 
-        //위도 경도로 버스 정류장의 정보를 가져옴
-        List<BusStop> busStop = findByLocation(locationRequest);
+        return busStopInfo(locationRequest)
+                .flatMapMany(Flux::fromIterable) // List<BusStop> -> Flux<BusStop>
+                .flatMap(busStop -> {
+                    // 노선 및 도착 요청을 병렬로 실행
+                    Mono<List<BusRouteItemDto>> routeRequest = nationalBusStopClient.busRouteRequest(busStop)
+                            .subscribeOn(Schedulers.boundedElastic()); // 병렬 실행
+                    Mono<List<BusArriveItemDto>> arriveRequest = nationalBusStopClient.busArriveRequest(busStop)
+                            .subscribeOn(Schedulers.boundedElastic()); // 병렬 실행
 
-        busStop.stream().forEach(busStop1 ->
-        {
-            //노선 정보들을 가져옴
-            busRouteItemDtos.addAll(busRouteInfo(busStop1));
-            items.addAll(nationalBusStopClient.busArriveRequest(busStop1));
+                    return Mono.zip(Mono.just(busStop), routeRequest, arriveRequest); // BusStop 포함한 병합된 결과 반환
+                })
+                .collectList() // 모든 결과를 List<Tuple3<...>>로 수집
+                .map(results -> {
+                    List<BusArriveDto> arriveBusDtos = new ArrayList<>();
+                    List<BusRouteItemDto> busRouteItemDtos = new ArrayList<>();
+                    List<BusArriveItemDto> items = new ArrayList<>();
+                    List<BusStopResponse> busStopResponses = new ArrayList<>();
 
-        });
-        stopWatch.stop();
+                    // 각 요청 결과를 분류
+                    results.forEach(result -> {
+                        BusStop busStop = result.getT1();
+                        busRouteItemDtos.addAll(result.getT2());
+                        items.addAll(result.getT3());
 
-        //객체 정렬
-        Collections.sort(items, new Comparator<BusArriveItemDto>() {
-            @Override
-            public int compare(BusArriveItemDto o1, BusArriveItemDto o2) {
-                return o1.getArrtime() - o2.getArrtime();
-            }
-        });
+                        // BusStop 정보를 BusStopResponse로 변환하여 추가
+                        busStopResponses.add(BusStopResponse.of(busStop));
+                    });
 
-        log.info("총 걸린 시간: {}",stopWatch.getTotalTimeMillis());
+                    // 도착 정보와 노선 정보를 매핑
+                    for (BusArriveItemDto busArriveItemDto : items) {
+                        for (BusRouteItemDto busRouteItemDto : busRouteItemDtos) {
+                            if (busArriveItemDto.getRouteid().equals(busRouteItemDto.getRouteid())) {
+                                arriveBusDtos.add(BusArriveDto.of(busArriveItemDto, busRouteItemDto));
+                            }
+                        }
+                    }
 
-        log.info("{}",items);
-        log.info("{}",busRouteItemDtos);
+                    stopWatch.stop();
+                    log.info("총 처리 시간: {} ms", stopWatch.getTotalTimeMillis());
 
-        for(BusArriveItemDto busArriveItemDto: items){
-            for(BusRouteItemDto busRouteItemDto : busRouteItemDtos){
-                if(busArriveItemDto.getRouteid().equals(busRouteItemDto.getRouteid())){
-                    arriveBusDtos.add(ArriveBusDto.of(busArriveItemDto,busRouteItemDto));
-                }
-            }
-        }
-
-        return BusArriveProvideResponse.builder()
-                .busStopResponse(busStop.stream().map(busStop1 -> BusStopResponse.of(busStop1)).toList())
-                .items(arriveBusDtos)
-                .build();
+                    // 최종 응답 생성
+                    return BusArriveProvideResponse.builder()
+                            .busStopResponse(busStopResponses) // 업데이트된 리스트 사용
+                            .items(arriveBusDtos)
+                            .build();
+                });
     }
 }
