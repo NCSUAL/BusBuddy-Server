@@ -1,31 +1,51 @@
 package Java2Project.service;
+import Java2Project.domain.BusStop;
 import Java2Project.domain.BusStopReview;
+import Java2Project.dto.request.ReviewRequest;
+import Java2Project.dto.response.ReviewResponse;
+import Java2Project.exception.NotFoundBusStop;
+import Java2Project.repository.BusStopRepository;
 import Java2Project.repository.BusStopReviewRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class BusStopReviewService {
-    private final BusStopReviewRepository reviewRepository;
+    private final BusStopRepository busStopRepository;
+
+    private final BusStopReviewRepository busReviewRepository;
 
 
-    public BusStopReviewService(BusStopReviewRepository reviewRepository){
-        this.reviewRepository = reviewRepository;
+    public BusStopReviewService(BusStopReviewRepository busReviewRepository, BusStopRepository busStopRepository){
+        this.busStopRepository = busStopRepository;
+        this.busReviewRepository = busReviewRepository;
     }
 
-    //CREATE
-    public BusStopReview createReview(BusStopReview review){
-        if (review == null || review.getReviewText().isEmpty()){
-            throw new IllegalArgumentException("Review cannot be empty");
-        }
-        return reviewRepository.save(review);
+    //댓글 추가
+    public ReviewResponse addComment(ReviewRequest reviewRequest){
+        //BusStopId로 정류장 조회
+        BusStop busStop = busStopRepository.findById(reviewRequest.busStopId())
+                .stream().findFirst().orElseThrow(() -> new NotFoundBusStop("해당 버스 정류장은 없습니다."));
+
+        return ReviewResponse.of(busReviewRepository.save(BusStopReview
+                .builder()
+                .busStop(busStop)
+                .rating(reviewRequest.Rated())
+                .reviewText(reviewRequest.comment())
+                .build()));
     }
 
-    //READ(특정 정류장의 리뷰 목록 조회
-
-    //특정 리뷰 상세조회
-    public BusStopReview getReviewbyId(Long reviewId){
-        return reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
+    //특정 정류장 리뷰 조회
+    public List<ReviewResponse> inquireAllReviews(String busStopId){
+        return busStopRepository.findById(busStopId)
+                .orElseThrow(() -> new NotFoundBusStop("해당 버스 정류장은 없습니다."))
+                .getBusStopReviews()
+                .stream()
+                .map(ReviewResponse::of)
+                .toList();
     }
+
 }

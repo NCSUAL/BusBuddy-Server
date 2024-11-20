@@ -24,7 +24,6 @@ public class BusStopController {
     //위도, 경도로 버스 정류장 찾기
     @PostMapping("/busStop")
     public ResponseEntity<Mono<List<BusStopResponse>>> getBusStopByLatitudeAndLongitude(@Valid @RequestBody LocationRequest locationRequest){
-
         return ResponseEntity.ok(
                         busStopService.busStopInfo(locationRequest)
                                 .map(busStops -> busStops.stream().map(BusStopResponse::of).toList())
