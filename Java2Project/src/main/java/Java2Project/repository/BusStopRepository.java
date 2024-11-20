@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BusStopRepository extends JpaRepository<BusStop,Long> {
+public interface BusStopRepository extends JpaRepository<BusStop,String> {
 
     //버스 정류장 이름으로 BusStop 객체 불러옴
     List<BusStop> findByStopName(String stopName);
@@ -21,8 +21,8 @@ public interface BusStopRepository extends JpaRepository<BusStop,Long> {
     @Query("SELECT " +
             "M " +
             "FROM BusStop M " +
-            "WHERE M.latitude BETWEEN :latitude-0.001 AND :latitude+0.001 " +
-            "AND M.longitude BETWEEN  :longitude-0.001 AND :longitude+0.001"
+            "WHERE M.latitude BETWEEN :latitude-0.002 AND :latitude+0.002 " +
+            "AND M.longitude BETWEEN  :longitude-0.002 AND :longitude+0.002"
     )
     List<BusStop> findByLatitudeAndLongitudeWithOption(@Param("latitude") double latitude, @Param("longitude") double longitude);
 

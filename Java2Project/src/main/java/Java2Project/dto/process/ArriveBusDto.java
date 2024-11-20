@@ -26,17 +26,16 @@ public class ArriveBusDto {
     public static ArriveBusDto of(BusArriveItemDto busArriveItemDto, BusRouteItemDto busRouteItemDto){
         //도착 시간을 가져옴
         int arrtime = busArriveItemDto.getArrtime();
-        int seconds = arrtime % 60;
-        int minutes = arrtime / 60 + (seconds>=40? 1: 0);
+        int minutes = arrtime / 60;
 
-        String arriveTime = minutes<=2? "곧 도착" : minutes +"분";
+        String arriveTime = minutes<2? "곧 도착" : minutes +"분";
 
         return ArriveBusDto
                 .builder()
                 .busNumber(busArriveItemDto.getRouteno())
                 .nodenm(busArriveItemDto.getNodenm())
                 .arriveTime(arriveTime)
-                .routeInfo(busRouteItemDto.getStartnodenm().concat(" -> ").concat(busRouteItemDto.getEndnodenm()))
+                .routeInfo(busRouteItemDto.getStartnodenm().concat(" ↔ ").concat(busRouteItemDto.getEndnodenm()))
                 .busStopCount(busArriveItemDto.getArrprevstationcnt().toString())
                 .build();
     }

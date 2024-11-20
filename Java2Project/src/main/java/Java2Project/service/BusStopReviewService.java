@@ -1,11 +1,11 @@
 package Java2Project.service;
 import Java2Project.domain.BusStopReview;
 import Java2Project.repository.BusStopReviewRepository;
-
-import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class BusStopReviewService {
     private final BusStopReviewRepository reviewRepository;
 
@@ -27,22 +27,5 @@ public class BusStopReviewService {
     //특정 리뷰 상세조회
     public BusStopReview getReviewbyId(Long reviewId){
         return reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
-    }
-
-    //Update 리뷰 업데이트 메서드
-    public BusStopReview updateReview(Long reviewId, BusStopReview updatedReview){
-        BusStopReview existingReview = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
-
-        //기존 리뷰 업데이트
-        existingReview.setReviewText(updatedReview.getReviewText());
-        existingReview.setRating(updatedReview.getRating());
-
-        return reviewRepository.save(existingReview);
-    }
-
-    //Delete 특정 리뷰 삭제 메서드
-    public void deleteReview(Long reviewId){
-        BusStopReview review = reviewRepository.findById(reviewId).orElseThrow(()->new IllegalArgumentException("Review not found with ID: " + reviewId));
-        reviewRepository.delete(review);
     }
 }
