@@ -27,7 +27,7 @@ public class BusStopReview {
     @Column(nullable = false)
     private Integer rating; //별점
 
-    private String reviewText; //리뷰내용
+    private String comment; //리뷰내용
 
     @Column(nullable = false)
     @CreationTimestamp
@@ -38,12 +38,12 @@ public class BusStopReview {
     }
 
     @Builder
-    public BusStopReview(Long reviewId, BusStop busStop, Integer rating, String reviewText, LocalDateTime createdAt) {
+    public BusStopReview(Long reviewId, BusStop busStop, Integer rating, String comment, LocalDateTime createdAt) {
         setBusStop(busStop);
         this.reviewId = reviewId;
         this.busStop = busStop;
         this.rating = rating;
-        this.reviewText = reviewText;
+        this.comment = comment;
         this.createdAt = createdAt;
     }
 

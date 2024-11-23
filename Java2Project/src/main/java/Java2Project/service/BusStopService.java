@@ -1,21 +1,15 @@
 package Java2Project.service;
 import Java2Project.client.NationalBusStopClient;
 import Java2Project.domain.BusStop;
-import Java2Project.domain.BusStopReview;
 import Java2Project.dto.busArrive.BusArriveItemDto;
 import Java2Project.dto.busRoute.BusRouteItemDto;
-import Java2Project.dto.busStop.BusStopItemDto;
 import Java2Project.dto.process.BusArriveDto;
 import Java2Project.dto.request.LocationRequest;
-import Java2Project.dto.request.ReviewRequest;
 import Java2Project.dto.response.BusArriveProvideResponse;
 import Java2Project.dto.response.BusStopResponse;
-import Java2Project.dto.response.ReviewResponse;
 import Java2Project.exception.NotFoundBusStop;
 import Java2Project.repository.BusStopRepository;
-import Java2Project.repository.BusStopReviewRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -27,7 +21,6 @@ import java.util.*;
 
 @Service
 @Slf4j
-@PropertySource("classpath:uri.properties")
 @Transactional(readOnly = true)
 public class BusStopService {
 
@@ -64,7 +57,12 @@ public class BusStopService {
                                     }
                                 })
                                 .map(busStopItemDtos -> busStopItemDtos.stream()
-                                        .filter(busStopItemDto -> busStopItemDtos.get(0).getNodeno().equals(busStopItemDto.getNodeno()))
+                                        .filter(busStopItemDto -> busStopItemDtos
+                                                .stream()
+                                                .filter(busStopItemDto1 -> busStopItemDto1.getNodeno() != null)
+                                                .findFirst()
+                                                .orElseThrow(() -> new NotFoundBusStop("APi 요청 오류")).getNodeno()
+                                                .equals(busStopItemDto.getNodeno()))
                                         .map(BusStop::of)
                                         .toList()
                                 )
@@ -82,7 +80,6 @@ public class BusStopService {
                     }
                 });
     }
-
 
     //정류소별 도착 예정 정보 목록 조회
     /*
@@ -120,6 +117,8 @@ public class BusStopService {
                         // BusStop 정보를 BusStopResponse로 변환하여 추가
                         busStopResponses.add(BusStopResponse.of(busStop));
                     });
+
+                    items.sort(Comparator.comparingInt(BusArriveItemDto::getArrtime));
 
                     // 도착 정보와 노선 정보를 매핑
                     for (BusArriveItemDto busArriveItemDto : items) {

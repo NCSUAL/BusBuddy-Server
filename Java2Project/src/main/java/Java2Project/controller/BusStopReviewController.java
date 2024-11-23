@@ -1,5 +1,6 @@
 package Java2Project.controller;
 import Java2Project.dto.request.ReviewRequest;
+import Java2Project.dto.request.SpecificReviewRequest;
 import Java2Project.dto.response.ReviewResponse;
 import Java2Project.service.BusStopReviewService;
 import jakarta.validation.Valid;
@@ -29,6 +30,12 @@ public class BusStopReviewController {
     @GetMapping("/{busStopId}")
     public ResponseEntity<List<ReviewResponse>> inquireAllReviews(@PathVariable("busStopId") String busStopId){
         return ResponseEntity.ok().body(busStopReviewService.inquireAllReviews(busStopId));
+    }
+
+    //특정 리뷰 수정
+    @PostMapping("/update")
+    public ResponseEntity<ReviewResponse> updateReview(@Valid @RequestBody SpecificReviewRequest specificReviewRequest){
+        return ResponseEntity.ok().body(busStopReviewService.updateReview(specificReviewRequest));
     }
 
 }
