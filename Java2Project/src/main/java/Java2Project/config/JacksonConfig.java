@@ -5,6 +5,7 @@ import Java2Project.dto.busRoute.BusRouteItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.cfg.CoercionAction;
 import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,14 +16,8 @@ public class JacksonConfig {
     @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();
-        // List 타입에 대한 빈 문자열을 빈 리스트로 처리
-        mapper.coercionConfigFor(List.class)
-                .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
-        // Items 타입에 대한 빈 문자열을 null로 처리할 수도 있음
-        mapper.coercionConfigFor(BusArriveItem.class)
-                .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
-        // Items 타입에 대한 빈 문자열을 null로 처리할 수도 있음
-        mapper.coercionConfigFor(BusRouteItem.class)
+        // 컬렉션 타입에 대한 빈 문자열을 빈 컬렉션으로 처리
+        mapper.coercionConfigFor(LogicalType.Collection)
                 .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
         return mapper;
     }
