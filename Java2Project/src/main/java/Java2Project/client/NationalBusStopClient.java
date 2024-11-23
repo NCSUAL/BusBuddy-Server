@@ -12,8 +12,6 @@ import Java2Project.utils.JsonNodeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -53,12 +50,9 @@ public class NationalBusStopClient {
 
     private final ObjectMapper objectMapper;
 
-    private final JsonNodeUtil jsonNodeUtil;
-
-    public NationalBusStopClient(WebClient webClient, ObjectMapper objectMapper,JsonNodeUtil jsonNodeUtil) {
+    public NationalBusStopClient(WebClient webClient, ObjectMapper objectMapper) {
         this.webClient = webClient;
         this.objectMapper = objectMapper;
-        this.jsonNodeUtil = jsonNodeUtil;
     }
 
     //노선 정보 요청
