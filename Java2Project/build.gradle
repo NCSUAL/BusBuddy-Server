@@ -30,6 +30,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux' //webClient 사용
+	//socket.IO
+	implementation 'com.corundumstudio.socketio:netty-socketio:2.0.9'
 }
 
 tasks.named('test') {

@@ -19,7 +19,7 @@ public class ReviewResponse {
                 .builder()
                 .reviewId(review.getReviewId())
                 .rating(review.getRating())
-                .reviewText(review.getReviewText())
+                .reviewText(review.getComment())
                 .build();
     }
 }
