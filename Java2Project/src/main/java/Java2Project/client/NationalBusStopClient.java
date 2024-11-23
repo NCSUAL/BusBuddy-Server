@@ -8,35 +8,32 @@ import Java2Project.dto.busStop.BusStopItem;
 import Java2Project.dto.busStop.BusStopItemDto;
 import Java2Project.dto.request.LocationRequest;
 import Java2Project.exception.JsonProcessing;
+import Java2Project.utils.JsonNodeUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
 @Slf4j
 @Component
+@PropertySource("classpath:uri.properties")
 @PropertySource("classpath:secret.properties")
 public class NationalBusStopClient {
 
     //비동기 요청을 위한 webClient
     private final WebClient webClient;
-
-    //동기 요청을 위한 restTemplate
-    private final RestTemplate restTemplate;
 
     //버스 정류장 도착 정보 URI
     @Value("${busArrive}")
@@ -56,10 +53,12 @@ public class NationalBusStopClient {
 
     private final ObjectMapper objectMapper;
 
-    public NationalBusStopClient(WebClient webClient, RestTemplate restTemplate, ObjectMapper objectMapper) {
+    private final JsonNodeUtil jsonNodeUtil;
+
+    public NationalBusStopClient(WebClient webClient, ObjectMapper objectMapper,JsonNodeUtil jsonNodeUtil) {
         this.webClient = webClient;
-        this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.jsonNodeUtil = jsonNodeUtil;
     }
 
     //노선 정보 요청
@@ -89,7 +88,12 @@ public class NationalBusStopClient {
                     //data flow processing
                     .flatMap(jsonNode -> {
                         try {
-                            return Mono.just(objectMapper.treeToValue(jsonNode, BusRouteItem.class).getItem());
+                            if(JsonNodeUtil.exceptionEmpty(jsonNode).isPresent()){
+                                return Mono.just(Collections.emptyList());
+                            }
+                            else{
+                                return Mono.just(objectMapper.treeToValue(jsonNode, BusRouteItem.class).getItem());
+                            }
                         } catch (JsonProcessingException e) {
                             return Mono.error(new JsonProcessing("서버 오류가 발생하였습니다. 이유: 노선 Json 변환 실패"));
                         }
@@ -122,7 +126,12 @@ public class NationalBusStopClient {
                     .map(jsonNode -> jsonNode.path("response").path("body").path("items"))
                     .flatMap(jsonNode -> {
                         try {
-                            return Mono.just(objectMapper.treeToValue(jsonNode,BusStopItem.class).getItem());
+                            if(JsonNodeUtil.exceptionEmpty(jsonNode).isPresent()){
+                                return Mono.just(Collections.emptyList());
+                            }
+                            else{
+                                return Mono.just(objectMapper.treeToValue(jsonNode,BusStopItem.class).getItem());
+                            }
                         } catch (JsonProcessingException e) {
                             return Mono.error(new JsonProcessing("서버 오류가 발생하였습니다. 이유: 버스정류장 Json 변환 실패"));
                         }
@@ -148,19 +157,16 @@ public class NationalBusStopClient {
                 .doOnNext(jsonNode -> log.info("응답 데이터: {}", jsonNode.toPrettyString()))
                 .map(jsonNode -> jsonNode.path("response").path("body").path("items"))
                 .flatMap(jsonNode -> {
-                    log.info("itemsNode 데이터: {}", jsonNode.toPrettyString());
-
-                    log.info("value: {}",jsonNode.getClass());
-
-                    if (!(jsonNode instanceof ObjectNode)) {
-                        log.info("value: {}",jsonNode.getClass());
-                        return Mono.just(Collections.emptyList());
-                    }
-
                     try {
-                        List<BusArriveItemDto> itemList = objectMapper.treeToValue(jsonNode,BusArriveItem.class).getItem();
-                        log.info("itemList: {}", itemList);
-                        return Mono.just(itemList);
+
+                        if(JsonNodeUtil.exceptionEmpty(jsonNode).isPresent()){
+                            return Mono.just(Collections.emptyList());
+                        }
+                        else{
+                            List<BusArriveItemDto> itemList = objectMapper.treeToValue(jsonNode,BusArriveItem.class).getItem();
+                            log.info("itemList: {}", itemList);
+                            return Mono.just(itemList);
+                        }
                     } catch (JsonProcessingException e) {
                         log.error("JSON 변환 실패: {}", e.getMessage(), e);
                         return Mono.error(new IllegalArgumentException("도착정보 JSON 변환 실패", e));

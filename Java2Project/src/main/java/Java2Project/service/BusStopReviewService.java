@@ -2,6 +2,7 @@ package Java2Project.service;
 import Java2Project.domain.BusStop;
 import Java2Project.domain.BusStopReview;
 import Java2Project.dto.request.ReviewRequest;
+import Java2Project.dto.request.SpecificReviewRequest;
 import Java2Project.dto.response.ReviewResponse;
 import Java2Project.exception.NotFoundBusStop;
 import Java2Project.repository.BusStopRepository;
@@ -17,11 +18,13 @@ public class BusStopReviewService {
     private final BusStopRepository busStopRepository;
 
     private final BusStopReviewRepository busReviewRepository;
+    private final BusStopReviewRepository busStopReviewRepository;
 
 
-    public BusStopReviewService(BusStopReviewRepository busReviewRepository, BusStopRepository busStopRepository){
+    public BusStopReviewService(BusStopReviewRepository busReviewRepository, BusStopRepository busStopRepository, BusStopReviewRepository busStopReviewRepository){
         this.busStopRepository = busStopRepository;
         this.busReviewRepository = busReviewRepository;
+        this.busStopReviewRepository = busStopReviewRepository;
     }
 
     //댓글 추가
@@ -34,7 +37,7 @@ public class BusStopReviewService {
                 .builder()
                 .busStop(busStop)
                 .rating(reviewRequest.Rated())
-                .reviewText(reviewRequest.comment())
+                .comment(reviewRequest.comment())
                 .build()));
     }
 
@@ -46,6 +49,18 @@ public class BusStopReviewService {
                 .stream()
                 .map(ReviewResponse::of)
                 .toList();
+    }
+
+    //특정 리뷰 수정
+    public ReviewResponse updateReview(SpecificReviewRequest specificReviewRequest){
+        BusStopReview busStopReview = busStopReviewRepository.findById(specificReviewRequest.reviewId())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundBusStop("해당 리뷰를 찾을 수 없습니다."));
+
+        busStopReview.setComment(specificReviewRequest.comment());
+
+        return ReviewResponse.of(busStopReview);
     }
 
 }
