@@ -7,19 +7,21 @@ import lombok.Getter;
 
 @Getter
 public class BusArriveDto {
-    private String busStopCount; //도착지까지 남은 정류장 수
-    private String nodenm;       //현재 버스가 위치한 정류장
-    private String arriveTime;   //도착까지 남은 시간(초)
-    private String busNumber;    //버스 노선 번호
-    private String routeInfo;    //버스 노선 정보
+    private final String busStopCount; //도착지까지 남은 정류장 수
+    private final String nodenm;       //현재 버스가 위치한 정류장
+    private final String arriveTime;   //도착까지 남은 시간(초)
+    private final String busNumber;    //버스 노선 번호
+    private final String routeInfo;    //버스 노선 정보
+    private final String routeId;      //버스 노선 ID
 
     @Builder
-    private BusArriveDto(String busStopCount, String arriveTime, String busNumber, String nodenm, String routeInfo) {
+    private BusArriveDto(String busStopCount, String arriveTime, String busNumber, String nodenm, String routeInfo,String routeId) {
         this.arriveTime = arriveTime;
         this.nodenm = nodenm;
         this.busStopCount = busStopCount;
         this.busNumber = busNumber;
         this.routeInfo = routeInfo;
+        this.routeId = routeId;
     }
 
     //factory
@@ -37,6 +39,7 @@ public class BusArriveDto {
                 .arriveTime(arriveTime)
                 .routeInfo(busRouteItemDto.getStartnodenm().concat(" ↔ ").concat(busRouteItemDto.getEndnodenm()))
                 .busStopCount(busArriveItemDto.getArrprevstationcnt().toString())
+                .routeId(busRouteItemDto.getRouteid())
                 .build();
     }
 
