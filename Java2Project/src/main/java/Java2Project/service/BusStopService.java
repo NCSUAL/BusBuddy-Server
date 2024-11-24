@@ -4,6 +4,7 @@ import Java2Project.domain.BusStop;
 import Java2Project.dto.busArrive.BusArriveItemDto;
 import Java2Project.dto.busRoute.BusRouteItemDto;
 import Java2Project.dto.process.BusArriveDto;
+import Java2Project.dto.process.BusItem;
 import Java2Project.dto.request.LocationRequest;
 import Java2Project.dto.response.BusArriveProvideResponse;
 import Java2Project.dto.response.BusStopResponse;
@@ -105,26 +106,29 @@ public class BusStopService {
                 .map(results -> {
                     List<BusArriveDto> arriveBusDtos = new ArrayList<>();
                     List<BusRouteItemDto> busRouteItemDtos = new ArrayList<>();
-                    List<BusArriveItemDto> items = new ArrayList<>();
+                    List<BusItem> items = new ArrayList<>();
                     List<BusStopResponse> busStopResponses = new ArrayList<>();
 
                     // 각 요청 결과를 분류
                     results.forEach(result -> {
                         BusStop busStop = result.getT1();
                         busRouteItemDtos.addAll(result.getT2());
-                        items.addAll(result.getT3());
+                        // BusArriveItemDto -> BusItem 변환 후 추가
+                        result.getT3().forEach(busArriveItemDto ->
+                                items.add(BusItem.of(busArriveItemDto, busStop))
+                        );
 
                         // BusStop 정보를 BusStopResponse로 변환하여 추가
                         busStopResponses.add(BusStopResponse.of(busStop));
                     });
 
-                    items.sort(Comparator.comparingInt(BusArriveItemDto::getArrtime));
+                    items.sort(Comparator.comparingInt(value -> value.getBusArriveItemDto().getArrtime()));
 
                     // 도착 정보와 노선 정보를 매핑
-                    for (BusArriveItemDto busArriveItemDto : items) {
+                    for (BusItem busItem : items) {
                         for (BusRouteItemDto busRouteItemDto : busRouteItemDtos) {
-                            if (busArriveItemDto.getRouteid().equals(busRouteItemDto.getRouteid())) {
-                                arriveBusDtos.add(BusArriveDto.of(busArriveItemDto, busRouteItemDto));
+                            if (busItem.getBusArriveItemDto().getRouteid().equals(busRouteItemDto.getRouteid())) {
+                                arriveBusDtos.add(BusArriveDto.of(busItem, busRouteItemDto));
                             }
                         }
                     }
