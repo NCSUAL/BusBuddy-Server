@@ -1,4 +1,4 @@
-package Java2Project.controller.exception;
+package Java2Project.handler;
 
 import Java2Project.exception.JsonProcessing;
 import Java2Project.exception.NotFoundBusStop;
