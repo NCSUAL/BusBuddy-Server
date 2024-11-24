@@ -2,10 +2,13 @@ package Java2Project.client;
 import Java2Project.domain.BusStop;
 import Java2Project.dto.busArrive.BusArriveItem;
 import Java2Project.dto.busArrive.BusArriveItemDto;
+import Java2Project.dto.busLocation.BusLocationItem;
+import Java2Project.dto.busLocation.BusLocationItemDto;
 import Java2Project.dto.busRoute.BusRouteItem;
 import Java2Project.dto.busRoute.BusRouteItemDto;
 import Java2Project.dto.busStop.BusStopItem;
 import Java2Project.dto.busStop.BusStopItemDto;
+import Java2Project.dto.request.BusRequest;
 import Java2Project.dto.request.LocationRequest;
 import Java2Project.exception.JsonProcessing;
 import Java2Project.utils.JsonNodeUtil;
@@ -16,12 +19,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -31,6 +37,9 @@ public class NationalBusStopClient {
 
     //비동기 요청을 위한 webClient
     private final WebClient webClient;
+
+    //동기 요청을 위한 restTemplate
+    private final RestTemplate restTemplate;
 
     //버스 정류장 도착 정보 URI
     @Value("${busArrive}")
@@ -44,15 +53,20 @@ public class NationalBusStopClient {
     @Value("${busRoute}")
     private String busRoute;
 
+    //버스 위치 정보 URI
+    @Value(("${busLocation}"))
+    private String busLocation;
+
     //공공데이터 serviceKey
     @Value("${serviceKey}")
     private String serviceKey;
 
     private final ObjectMapper objectMapper;
 
-    public NationalBusStopClient(WebClient webClient, ObjectMapper objectMapper) {
+    public NationalBusStopClient(WebClient webClient, ObjectMapper objectMapper,RestTemplate restTemplate) {
         this.webClient = webClient;
         this.objectMapper = objectMapper;
+        this.restTemplate = restTemplate;
     }
 
     //노선 정보 요청
@@ -166,6 +180,34 @@ public class NationalBusStopClient {
                         return Mono.error(new IllegalArgumentException("도착정보 JSON 변환 실패", e));
                     }
                 });
+    }
+
+    //버스 정류장 위치
+    public Optional<BusLocationItemDto> busLocationRequest(BusRequest busRequest){
+        URI uri = UriComponentsBuilder.fromHttpUrl(busLocation)
+                .replaceQuery(String.format(
+                        "serviceKey=%s&pageNo=%d&numOfRows=%d&_type=%s&cityCode=%d&routeId=%s",
+                        serviceKey, 1, 10, "json", busRequest.cityCode(), busRequest.routeId()
+                ))
+                .build(true)
+                .toUri();
+
+        log.info("버스 위치 정보 URI: {}", uri);
+
+        JsonNode jsonNode = restTemplate.getForObject(uri, JsonNode.class).path("response").path("body").path("items");
+
+        if(JsonNodeUtil.exceptionEmpty(jsonNode).isPresent()){
+            return Optional.empty();
+        }
+        else{
+            try{
+                return Optional.of(objectMapper.treeToValue(jsonNode, BusLocationItem.class).getItem().stream().filter(busLocationItemDto -> busLocationItemDto.getNodeOrd() >= busRequest.busStopCount()).sorted(Comparator.comparingInt(BusLocationItemDto::getNodeOrd)).findFirst().get());
+            }
+            catch (JsonProcessingException e){
+                log.error("NationalBusStopClient -> busLocationRequest Error : {}", e.toString());
+                return Optional.empty();
+            }
+        }
     }
 
 }
