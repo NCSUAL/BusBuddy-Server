@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "bus_stops")
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class BusStop {
 
@@ -32,10 +31,15 @@ public class BusStop {
 
     @Column(name = "nodeno")
     private Integer nodeNo;
+
     //cascade: DB 개념, 부모에서 데이터가 변경되면 자식에도 영향을 준다
     //orpanRemoval: DB 개념, 부모와 자식이 끊어지면 자식 전체를 삭제한다.
     @OneToMany(mappedBy = "busStop",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<BusStopReview> busStopReviews = new ArrayList<>();
+
+    @OneToOne(mappedBy = "busStop",cascade = CascadeType.ALL,orphanRemoval = true)
+    @Setter
+    private Facilities facilities;
 
     protected BusStop(){
 

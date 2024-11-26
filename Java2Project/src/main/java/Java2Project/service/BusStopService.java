@@ -60,6 +60,9 @@ public class BusStopService {
                                 .map(busStopItemDtos -> busStopItemDtos.stream()
                                         .filter(busStopItemDto -> busStopItemDtos
                                                 .stream()
+                                                .sorted(Comparator.comparingDouble(o ->
+                                                        Math.abs(locationRequest.latitude() - o.getGpslati()) +
+                                                                Math.abs(locationRequest.longitude() - o.getGpslong())))
                                                 .filter(busStopItemDto1 -> busStopItemDto1.getNodeno() != null)
                                                 .findFirst()
                                                 .orElseThrow(() -> new NotFoundBusStop("APi 요청 오류")).getNodeno()

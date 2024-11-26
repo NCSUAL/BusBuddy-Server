@@ -2,7 +2,6 @@ package Java2Project.handler;
 
 import Java2Project.client.NationalBusStopClient;
 import Java2Project.dto.request.BusRequest;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
-public class MyWebSocketHandler extends TextWebSocketHandler {
+public class WebSocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -25,7 +24,7 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
     private final NationalBusStopClient nationalBusStopClient;
 
-    public MyWebSocketHandler(NationalBusStopClient nationalBusStopClient) {
+    public WebSocketHandler(NationalBusStopClient nationalBusStopClient) {
         this.nationalBusStopClient = nationalBusStopClient;
     }
     @Override
@@ -60,13 +59,21 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
                         sessionCounters.put(session,sessionCounters.get(session) -1);
                     }
                     catch (Exception e){
-                        log.error("MyWebSocketHandler -> sendData -> json 변환 실패: {}", e.toString());
+                        log.error("WebSocketHandler -> sendData -> json 변환 실패: {}", e.toString());
                         try {
                             session.close();
                         }
                         catch (IOException e1){
-                            log.error("MyWebSocketHandler Error: {}", e1.toString());
+                            log.error("WebSocketHandler Error: {}", e1.toString());
                         }
+                    }
+                }
+                else{
+                    try {
+                        session.close();
+                    }
+                    catch (IOException e){
+                        log.error("WebSocketHandler Error: {}", e.toString());
                     }
                 }
             }

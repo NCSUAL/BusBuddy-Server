@@ -1,10 +1,9 @@
 package Java2Project.config;
 
 import Java2Project.client.NationalBusStopClient;
-import Java2Project.handler.MyWebSocketHandler;
+import Java2Project.handler.WebSocketHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.WebSocketHandler;
 
 @Configuration
 public class WebSocketHandlerConfig {
@@ -17,7 +16,7 @@ public class WebSocketHandlerConfig {
 
 
     @Bean
-    public WebSocketHandler webSocketHandler() {
-        return new MyWebSocketHandler(nationalBusStopClient);
+    public org.springframework.web.socket.WebSocketHandler webSocketHandler() {
+        return new WebSocketHandler(nationalBusStopClient);
     }
 }

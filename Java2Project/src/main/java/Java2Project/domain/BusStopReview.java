@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Builder
 @Entity
 @Table(name = "bus_stop_reviews")
 public class BusStopReview {
@@ -27,6 +26,8 @@ public class BusStopReview {
     @Column(nullable = false)
     private Integer rating; //별점
 
+    private String ip;
+
     private String comment; //리뷰내용
 
     @Column(nullable = false)
@@ -38,13 +39,14 @@ public class BusStopReview {
     }
 
     @Builder
-    public BusStopReview(Long reviewId, BusStop busStop, Integer rating, String comment, LocalDateTime createdAt) {
+    public BusStopReview(Long reviewId, BusStop busStop, Integer rating, String comment, LocalDateTime createdAt,String ip) {
         setBusStop(busStop);
         this.reviewId = reviewId;
         this.busStop = busStop;
         this.rating = rating;
         this.comment = comment;
         this.createdAt = createdAt;
+        this.ip = ip;
     }
 
     //연관관계 설정

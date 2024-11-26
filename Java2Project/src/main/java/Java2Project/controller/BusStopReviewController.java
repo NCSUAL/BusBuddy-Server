@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/review")
 public class BusStopReviewController {
 
-    private BusStopReviewService busStopReviewService;
+    private final BusStopReviewService busStopReviewService;
 
     public BusStopReviewController(BusStopReviewService busStopReviewService) {
         this.busStopReviewService = busStopReviewService;
@@ -26,16 +26,23 @@ public class BusStopReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saveReview);
     }
 
-    //Read API (특정 정류장의 리뷰 목록 조회)
+    //특정 정류장의 리뷰 목록 조회
     @GetMapping("/{busStopId}")
     public ResponseEntity<List<ReviewResponse>> inquireAllReviews(@PathVariable("busStopId") String busStopId){
         return ResponseEntity.ok().body(busStopReviewService.inquireAllReviews(busStopId));
     }
 
     //특정 리뷰 수정
-    @PostMapping("/update")
+    @PutMapping
     public ResponseEntity<ReviewResponse> updateReview(@Valid @RequestBody SpecificReviewRequest specificReviewRequest){
         return ResponseEntity.ok().body(busStopReviewService.updateReview(specificReviewRequest));
+    }
+
+    //특정 리뷰 삭제
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable("reviewId") Long reviewId){
+        busStopReviewService.deleteReview(reviewId);
+        return ResponseEntity.ok().body("삭제가 완료되었습니다.");
     }
 
 }
