@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
-public class BusStopExceptionHandler {
+public class CustomExceptionHandler {
 
     //버스정류장을 찾지 못했을 때
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -28,7 +28,7 @@ public class BusStopExceptionHandler {
 
     //body 데이터 검증 @valid
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String,String>> notValidException(MethodArgumentNotValidException ex){
         Map<String, String> errors = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class BusStopExceptionHandler {
 
     //외부 api 요청 실패
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    @ExceptionHandler({RestClientException.class})
+    @ExceptionHandler(RestClientException.class)
     public ResponseEntity<?> failedApiRequestException(RestClientException ex){
         return ResponseEntity.badRequest().body("api 요청을 실패하였습니다.");
     }
@@ -50,7 +50,7 @@ public class BusStopExceptionHandler {
 
     //json 변환 실패
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler({JsonProcessing.class})
+    @ExceptionHandler(JsonProcessing.class)
     public ResponseEntity<?> jsonProcessingException(JsonProcessing e){
         return ResponseEntity.badRequest().body(e.getMessage());
     }
